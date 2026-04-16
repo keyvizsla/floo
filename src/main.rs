@@ -14,9 +14,11 @@ use std::{
     path::PathBuf,
 };
 
+use crate::layout::draw;
 use crate::{action::Action, project::Project, state::AppState};
 
 mod action;
+mod layout;
 mod project;
 mod state;
 
@@ -73,31 +75,14 @@ fn main() -> Result<(), io::Error> {
     let mut state = AppState::new(items);
 
     loop {
-        terminal.draw(|f| {
-            let list_items: Vec<ListItem> = state
-                .projects
-                .iter()
-                .map(|i| ListItem::new(i.name.clone()))
-                .collect();
-
-            let list = List::new(list_items)
-                .block(
-                    Block::default()
-                        .title(" Select an Item (j/k or Arrows) ")
-                        .borders(Borders::ALL),
-                )
-                .highlight_symbol(">> ")
-                .repeat_highlight_symbol(true);
-
-            f.render_stateful_widget(list, f.area(), &mut state.project_list_state);
-        })?;
+        terminal.draw(|frame| draw(frame, &mut state))?;
 
         match state.handle_input()? {
             Some(Action::Quit) => {
                 break;
             }
             Some(Action::Pick(proj)) => {
-                output_shell_cmd(&proj, &output_path);
+                let _ = output_shell_cmd(&proj, &output_path);
                 break;
             }
             _ => {}
