@@ -8,25 +8,77 @@ use ratatui::{
     backend::CrosstermBackend,
     widgets::{Block, Borders, List, ListItem, ListState},
 };
-use std::io;
+use std::{
+    env,
+    io::{self, Stdout},
+    path::PathBuf,
+};
 
-fn main() -> Result<(), io::Error> {
+use crate::{action::Action, project::Project, state::AppState};
+
+mod action;
+mod project;
+mod state;
+
+/// Initialize the TUI-App and return the Terminal object.
+fn init_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, io::Error> {
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stdout);
-    let mut terminal = Terminal::new(backend)?;
+    Ok(Terminal::new(backend)?)
+}
 
-    let items = vec!["Apple", "Banana", "Cherry", "Date", "Elderberry"];
-    let mut state = ListState::default();
-    state.select(Some(0));
+fn init_projects() -> Vec<Project> {
+    // TODO: Replace by dynamically configured projects
+    vec![
+        Project {
+            name: "Project 1".to_string(),
+            directory: "..".to_string(),
+        },
+        Project {
+            name: "Project 2".to_string(),
+            directory: "../gat".to_string(),
+        },
+        Project {
+            name: "Project 3".to_string(),
+            directory: "../bnfls".to_string(),
+        },
+    ]
+}
 
-    let mut selected_item = None;
+fn output_shell_cmd(project: &Project, output_path: &PathBuf) -> Result<(), io::Error> {
+    let mut instructions = String::new();
 
-    // 3. Main Loop
+    instructions.push_str(&format!("cd '{}'\n", project.directory));
+
+    // let quickstart = project_path.join(".quickstart");
+    // if quickstart.exists() {
+    //     instructions.push_str(&format!("source '{}'\n", quickstart.display()));
+    // }
+
+    std::fs::write(output_path, instructions)?;
+    Ok(())
+}
+
+fn main() -> Result<(), io::Error> {
+    let mut terminal = init_terminal()?;
+    let items = init_projects();
+
+    let output_path = env::var("FLOO_OUTPUT_FILE")
+        .ok()
+        .map(PathBuf::from)
+        .unwrap();
+
+    let mut state = AppState::new(items);
+
     loop {
         terminal.draw(|f| {
-            let list_items: Vec<ListItem> = items.iter().map(|i| ListItem::new(*i)).collect();
+            let list_items: Vec<ListItem> = state
+                .projects
+                .iter()
+                .map(|i| ListItem::new(i.name.clone()))
+                .collect();
 
             let list = List::new(list_items)
                 .block(
@@ -37,36 +89,18 @@ fn main() -> Result<(), io::Error> {
                 .highlight_symbol(">> ")
                 .repeat_highlight_symbol(true);
 
-            f.render_stateful_widget(list, f.area(), &mut state);
+            f.render_stateful_widget(list, f.area(), &mut state.project_list_state);
         })?;
 
-        if let Event::Key(key) = event::read()? {
-            match key.code {
-                KeyCode::Char('q') => break,
-                KeyCode::Char('j') | KeyCode::Down => {
-                    let i = match state.selected() {
-                        Some(i) if i >= items.len() - 1 => 0,
-                        Some(i) => i + 1,
-                        None => 0,
-                    };
-                    state.select(Some(i));
-                }
-                KeyCode::Char('k') | KeyCode::Up => {
-                    let i = match state.selected() {
-                        Some(i) if i == 0 => items.len() - 1,
-                        Some(i) => i - 1,
-                        None => 0,
-                    };
-                    state.select(Some(i));
-                }
-                KeyCode::Enter => {
-                    if let Some(i) = state.selected() {
-                        selected_item = Some(items[i].to_string());
-                    }
-                    break;
-                }
-                _ => {}
+        match state.handle_input()? {
+            Some(Action::Quit) => {
+                break;
             }
+            Some(Action::Pick(proj)) => {
+                output_shell_cmd(&proj, &output_path);
+                break;
+            }
+            _ => {}
         }
     }
 
@@ -78,11 +112,6 @@ fn main() -> Result<(), io::Error> {
         DisableMouseCapture
     )?;
     terminal.show_cursor()?;
-
-    // 5. Output to stdout
-    if let Some(item) = selected_item {
-        println!("{}", item);
-    }
 
     Ok(())
 }
