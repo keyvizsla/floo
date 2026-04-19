@@ -1,8 +1,10 @@
+use std::os::unix::raw;
+
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Spacing},
     symbols::merge::MergeStrategy,
-    widgets::{Block, Borders, List, ListItem, Paragraph},
+    widgets::{Block, Borders, List, ListItem, Paragraph, Wrap},
 };
 
 use crate::state::AppState;
@@ -17,7 +19,16 @@ pub fn draw(frame: &mut Frame, state: &mut AppState) {
         .areas(frame.area());
 
     frame.render_stateful_widget(list, left, &mut state.project_list_state);
-    frame.render_widget(component_project_description(state.clone()), right);
+
+    let raw_project_description = state
+        .selected_project()
+        .unwrap()
+        .get_description()
+        .unwrap_or_else(|| "No description available.".to_string());
+    frame.render_widget(
+        component_project_description(&raw_project_description),
+        right,
+    );
 }
 
 /// Generate the list to be displayed on the left side of the screen
@@ -42,18 +53,16 @@ fn component_project_list(state: AppState) -> List<'static> {
     return list;
 }
 
-fn component_project_description(state: AppState) -> Paragraph<'static> {
-    let text = state
-        .selected_project()
-        .unwrap()
-        .get_description()
-        .unwrap_or_else(|| "No description available.".to_string());
+/// Return the given text rendered, assuming it is a markdown project description.
+/// TODO: Make long text scrollable
+fn component_project_description<'a>(text: &'a str) -> Paragraph<'a> {
+    let parsed_text = tui_markdown::from_str(text);
 
-    let text_elem = Paragraph::new(text).block(
-        Block::bordered()
-            .title("Project Description")
-            .merge_borders(MergeStrategy::Exact),
-    );
-
-    return text_elem;
+    Paragraph::new(parsed_text)
+        .block(
+            Block::bordered()
+                .title("Project Description")
+                .merge_borders(MergeStrategy::Exact),
+        )
+        .wrap(Wrap { trim: false })
 }
