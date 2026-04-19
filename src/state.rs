@@ -3,7 +3,7 @@ use ratatui::widgets::ListState;
 use crate::action::Action;
 use crate::project::Project;
 use crossterm::event::{self, Event, KeyCode};
-use std::io::{self, Stdout};
+use std::io::{self};
 
 #[derive(Debug, Default, Clone)]
 pub struct AppState {

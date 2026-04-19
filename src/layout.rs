@@ -1,5 +1,3 @@
-use std::os::unix::raw;
-
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Spacing},
