@@ -36,15 +36,15 @@ fn init_projects() -> Vec<Project> {
     vec![
         Project {
             name: "Project 1".to_string(),
-            directory: "/home/leon/projects/floo/".to_string(),
+            directory: "/home/leon/projects/floo/".into(),
         },
         Project {
             name: "Project 2".to_string(),
-            directory: "../gat".to_string(),
+            directory: "../gat".into(),
         },
         Project {
             name: "Project 3".to_string(),
-            directory: "../bnfls".to_string(),
+            directory: "../bnfls".into(),
         },
     ]
 }
@@ -52,7 +52,7 @@ fn init_projects() -> Vec<Project> {
 fn output_shell_cmd(project: &Project, output_path: &PathBuf) -> Result<(), io::Error> {
     let mut instructions = String::new();
 
-    instructions.push_str(&format!("cd '{}'\n", project.directory));
+    instructions.push_str(&format!("cd '{}'\n", project.directory.to_str().unwrap()));
 
     // let quickstart = project_path.join(".quickstart");
     // if quickstart.exists() {

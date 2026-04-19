@@ -5,7 +5,7 @@ use crate::project::Project;
 use crossterm::event::{self, Event, KeyCode};
 use std::io::{self, Stdout};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct AppState {
     pub projects: Vec<Project>,
     selected_index: usize,
@@ -20,6 +20,11 @@ impl AppState {
             project_list_state: ListState::default().with_selected(Some(0)),
         }
     }
+
+    pub fn selected_project(&self) -> Option<&Project> {
+        return self.projects.get(self.selected_index);
+    }
+
     pub fn handle_input(&mut self) -> Result<Option<Action>, io::Error> {
         if let Event::Key(key) = event::read()? {
             match key.code {
