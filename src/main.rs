@@ -36,7 +36,7 @@ fn init_projects() -> Vec<Project> {
     vec![
         Project {
             name: "Project 1".to_string(),
-            directory: "..".to_string(),
+            directory: "/home/leon/projects/floo/".to_string(),
         },
         Project {
             name: "Project 2".to_string(),
