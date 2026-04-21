@@ -34,7 +34,7 @@ fn init_projects() -> Vec<Project> {
     match get_projects() {
         Ok(projects) => projects,
         Err(_) => {
-            println!("Unable to access or create databse. Please report this error.");
+            println!("Unable to access or create database. Please report this error.");
             exit(1);
         }
     }

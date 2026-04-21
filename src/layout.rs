@@ -18,6 +18,7 @@ pub fn draw(frame: &mut Frame, state: &mut AppState) {
 
     frame.render_stateful_widget(list, left, &mut state.project_list_state);
 
+    // TODO: Handle empty db
     let raw_project_description = state
         .selected_project()
         .unwrap()

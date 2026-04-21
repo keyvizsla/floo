@@ -62,5 +62,12 @@ fn db_filepath() -> PathBuf {
         return path.unwrap().join(".floo.db");
     }
 
-    return PathBuf::from("~/.local/share/my-app/").join(".floo.db");
+    let home_directory = PathBuf::from(env::var("HOME").expect("Cannot deduce db path without HOME directory"));
+    let floo_directory = home_directory.join(".local/share/floo/");
+
+    if !floo_directory.exists() {
+        std::fs::create_dir_all(&floo_directory).expect("Failed to create .floo directory");
+    }
+
+    return floo_directory.join(".floo.db");
 }
