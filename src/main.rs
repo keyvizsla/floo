@@ -45,10 +45,10 @@ fn output_shell_cmd(project: &Project, output_path: &PathBuf) -> Result<(), io::
 
     instructions.push_str(&format!("cd '{}'\n", project.directory.to_str().unwrap()));
 
-    // let quickstart = project_path.join(".quickstart");
-    // if quickstart.exists() {
-    //     instructions.push_str(&format!("source '{}'\n", quickstart.display()));
-    // }
+    let project_script_path = project.directory.join(".floo");
+    if project_script_path.exists() {
+        instructions.push_str(&format!("source '{}'\n", project_script_path.display()));
+    }
 
     std::fs::write(output_path, instructions)?;
     Ok(())
