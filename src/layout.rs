@@ -39,7 +39,7 @@ pub fn draw_empty_state_screen(f: &mut Frame) {
 ╚═╝     ╚══════╝ ╚═════╝  ╚═════╝ "#;
 
     let version_hint = Span::styled(
-        " v0.0.1",
+        " v0.1.0",
         Style::default()
             .fg(Color::DarkGray)
             .add_modifier(Modifier::ITALIC),
