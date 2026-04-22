@@ -1,10 +1,8 @@
 # floo
 
-# 🟢 floo
-
 **Ignite your workspace. Travel between projects at terminal velocity.**
 
-[Insert Logo or Banner Image Here]
+![](assets/logo.png)
 
 [](https://opensource.org/licenses/MIT)
 [](https://ratatui.rs)
