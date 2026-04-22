@@ -3,7 +3,12 @@ name = "floo"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "floo-bin"
+path = "src/main.rs"
+
 [dependencies]
 crossterm = "0.29.0"
 ratatui = "0.30.0"
+rusqlite = "0.39.0"
 tui-markdown = "0.3.7"

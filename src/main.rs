@@ -1,23 +1,22 @@
 use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
+    event::{DisableMouseCapture, EnableMouseCapture},
     execute,
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
-use ratatui::{
-    Terminal,
-    backend::CrosstermBackend,
-    widgets::{Block, Borders, List, ListItem, ListState},
-};
+use ratatui::{Terminal, backend::CrosstermBackend};
 use std::{
     env,
     io::{self, Stdout},
     path::PathBuf,
+    process::exit,
 };
 
+use crate::db_handler::get_projects;
 use crate::layout::draw;
 use crate::{action::Action, project::Project, state::AppState};
 
 mod action;
+mod db_handler;
 mod layout;
 mod project;
 mod state;
@@ -32,21 +31,13 @@ fn init_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, io::Error> {
 }
 
 fn init_projects() -> Vec<Project> {
-    // TODO: Replace by dynamically configured projects
-    vec![
-        Project {
-            name: "Project 1".to_string(),
-            directory: "/home/leon/projects/floo/".into(),
-        },
-        Project {
-            name: "Project 2".to_string(),
-            directory: "../gat".into(),
-        },
-        Project {
-            name: "Project 3".to_string(),
-            directory: "../bnfls".into(),
-        },
-    ]
+    match get_projects() {
+        Ok(projects) => projects,
+        Err(_) => {
+            println!("Unable to access or create database. Please report this error.");
+            exit(1);
+        }
+    }
 }
 
 fn output_shell_cmd(project: &Project, output_path: &PathBuf) -> Result<(), io::Error> {
@@ -54,10 +45,10 @@ fn output_shell_cmd(project: &Project, output_path: &PathBuf) -> Result<(), io::
 
     instructions.push_str(&format!("cd '{}'\n", project.directory.to_str().unwrap()));
 
-    // let quickstart = project_path.join(".quickstart");
-    // if quickstart.exists() {
-    //     instructions.push_str(&format!("source '{}'\n", quickstart.display()));
-    // }
+    let project_script_path = project.directory.join(".floo");
+    if project_script_path.exists() {
+        instructions.push_str(&format!("source '{}'\n", project_script_path.display()));
+    }
 
     std::fs::write(output_path, instructions)?;
     Ok(())
