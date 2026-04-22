@@ -1,7 +1,9 @@
 use ratatui::{
     Frame,
-    layout::{Constraint, Layout, Spacing},
+    layout::{Alignment, Constraint, Direction, Layout, Spacing},
+    style::{Color, Modifier, Style, Stylize},
     symbols::merge::MergeStrategy,
+    text::{Line, Span, Text},
     widgets::{Block, Borders, List, ListItem, Paragraph, Wrap},
 };
 
@@ -11,6 +13,60 @@ use crate::state::AppState;
 
 /// Draw the main app screen onto the given frame.
 pub fn draw(frame: &mut Frame, state: &mut AppState) {
+    if state.projects.len() > 0 {
+        draw_with_projects(frame, state);
+    } else {
+        draw_empty_state_screen(frame);
+    }
+}
+
+pub fn draw_empty_state_screen(f: &mut Frame) {
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage(30),
+            Constraint::Length(12),
+            Constraint::Percentage(30),
+        ])
+        .split(f.area());
+
+    let ascii_logo = r#"
+███████╗██╗      ██████╗  ██████╗ 
+██╔════╝██║     ██╔═══██╗██╔═══██╗
+█████╗  ██║     ██║   ██║██║   ██║
+██╔══╝  ██║     ██║   ██║██║   ██║
+██║     ███████╗╚██████╔╝╚██████╔╝
+╚═╝     ╚══════╝ ╚═════╝  ╚═════╝ "#;
+
+    let version_hint = Span::styled(
+        " v0.0.1",
+        Style::default()
+            .fg(Color::DarkGray)
+            .add_modifier(Modifier::ITALIC),
+    );
+
+    let status_line = Line::from("Your floo network is dark, no fireplaces are connected.").bold();
+    let hint_line = Line::from(vec![
+        Span::raw("To add a destination, press "),
+        Span::styled("n", Style::default().bold().fg(Color::LightCyan)),
+        Span::raw(" or "),
+        Span::styled("%", Style::default().bold().fg(Color::LightCyan)),
+    ])
+    .fg(Color::DarkGray);
+
+    let mut final_content = Text::from(ascii_logo);
+    final_content.lines.push(Line::from(version_hint));
+    final_content.lines.push(Line::from("")); // Spacer
+    final_content.lines.push(status_line);
+    final_content.lines.push(hint_line);
+
+    let paragraph = Paragraph::new(final_content).alignment(Alignment::Center);
+
+    f.render_widget(paragraph, chunks[1]);
+}
+
+/// Draw the main screen given that the state contains at least 1 project.
+fn draw_with_projects(frame: &mut Frame, state: &mut AppState) {
     let list = component_project_list(state.clone());
     let [left, right] = Layout::horizontal([Constraint::Fill(1); 2])
         .spacing(Spacing::Overlap(1))
@@ -18,7 +74,6 @@ pub fn draw(frame: &mut Frame, state: &mut AppState) {
 
     frame.render_stateful_widget(list, left, &mut state.project_list_state);
 
-    // TODO: Handle empty db
     let raw_project_description = state
         .selected_project()
         .unwrap()
