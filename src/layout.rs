@@ -6,8 +6,9 @@ use ratatui::{
     text::{Line, Span, Text},
     widgets::{Block, Borders, List, ListItem, Paragraph, Wrap},
 };
-
+use crate::components::component::Component;
 use crate::state::AppState;
+use crate::components::start_screen::StartScreen;
 
 /// Module handles all the layout and drawing of the app screen
 
@@ -21,48 +22,10 @@ pub fn draw(frame: &mut Frame, state: &mut AppState) {
 }
 
 pub fn draw_empty_state_screen(f: &mut Frame) {
-    let chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints([
-            Constraint::Percentage(30),
-            Constraint::Length(12),
-            Constraint::Percentage(30),
-        ])
-        .split(f.area());
-
-    let ascii_logo = r#"
-███████╗██╗      ██████╗  ██████╗ 
-██╔════╝██║     ██╔═══██╗██╔═══██╗
-█████╗  ██║     ██║   ██║██║   ██║
-██╔══╝  ██║     ██║   ██║██║   ██║
-██║     ███████╗╚██████╔╝╚██████╔╝
-╚═╝     ╚══════╝ ╚═════╝  ╚═════╝ "#;
-
-    let version_hint = Span::styled(
-        " v0.1.0",
-        Style::default()
-            .fg(Color::DarkGray)
-            .add_modifier(Modifier::ITALIC),
-    );
-
-    let status_line = Line::from("Your floo network is dark, no fireplaces are connected.").bold();
-    let hint_line = Line::from(vec![
-        Span::raw("To add a destination, press "),
-        Span::styled("n", Style::default().bold().fg(Color::LightCyan)),
-        Span::raw(" or "),
-        Span::styled("%", Style::default().bold().fg(Color::LightCyan)),
-    ])
-    .fg(Color::DarkGray);
-
-    let mut final_content = Text::from(ascii_logo);
-    final_content.lines.push(Line::from(version_hint));
-    final_content.lines.push(Line::from("")); // Spacer
-    final_content.lines.push(status_line);
-    final_content.lines.push(hint_line);
-
-    let paragraph = Paragraph::new(final_content).alignment(Alignment::Center);
-
-    f.render_widget(paragraph, chunks[1]);
+    // TODO: init only once and then make
+    let mut screen = StartScreen::default();
+    let _ = screen.init();
+    screen.render(f, f.area());
 }
 
 /// Draw the main screen given that the state contains at least 1 project.
