@@ -128,6 +128,7 @@ Built with ❤️ for the terminal-centric developer.
 
 ### Future features
 
+- Better markdown rendering: Test the usage of the markdown feature of ratatui_interactive
 - Sorting: Users can configure the order in which to list their fireplaces (by last used, lexicographically, ...)
 - Auto-Ignition: Templates for `.floo` script creation. Workflows oftentimes look very similar.
 - Add git status of fireplace in tui overview, beyond the README.
