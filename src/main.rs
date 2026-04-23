@@ -16,6 +16,7 @@ use crate::layout::draw;
 use crate::{action::Action, project::Project, state::AppState};
 
 mod action;
+mod components;
 mod db_handler;
 mod layout;
 mod project;
