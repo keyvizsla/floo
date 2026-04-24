@@ -7,7 +7,7 @@ pub enum Action {
     CreateNewFireplace,
 
     // Add an existing fireplace with all properties in place to the app
-    AddFireplace,
+    AddFireplace(Project),
     ClosePopup,
 
     Pick(Project),

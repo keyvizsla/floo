@@ -1,13 +1,12 @@
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
-use crossterm::event::Event::Key;
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use ratatui::prelude::{Color, Line, Modifier, Span, Style, Stylize, Text};
 use ratatui::widgets::Paragraph;
-use ratatui_interact::components::PopupDialog;
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
+use crate::db_handler;
 
 #[derive(Default)]
 pub struct StartScreen {
@@ -28,6 +27,11 @@ impl Component for StartScreen {
         if let Some(popup) = &mut self.creation_popup {
             match popup.handle_events(event) {
                 Action::ClosePopup => { self.creation_popup = None },
+                Action::AddFireplace(project) => {
+                    // TODO: handle failures in db edit
+                    self.creation_popup = None;
+                    return Action::AddFireplace(project);
+                }
                 _ => {},
             }
             return Action::Noop;

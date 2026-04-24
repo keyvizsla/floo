@@ -13,6 +13,7 @@ use crate::action::Action;
 use crate::components::component::Component;
 use crate::components::main_screen::MainScreen;
 use crate::components::start_screen::StartScreen;
+use crate::db_handler;
 
 pub struct AppCreationError {}
 pub struct App {
@@ -65,6 +66,13 @@ impl App {
         };
 
         match action {
+            Action::AddFireplace(project) => {
+                // TODO: write project to database, not just in memory
+                let _ = db_handler::add_project(project.clone());
+                self.state.projects.push(project.clone());
+                self.main_screen.add_project(project);
+                Action::Noop
+            },
            Action::Quit => {
                 self.cleanup();
                return Action::Quit;

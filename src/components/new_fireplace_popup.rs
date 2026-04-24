@@ -7,6 +7,7 @@ use ratatui_interact::events::{get_char, is_backspace, is_delete, is_end, is_ent
 use ratatui_interact::prelude::PopupDialog;
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
+use crate::project::Project;
 
 pub struct NewFireplaceComponent {
     dialog_state: DialogState<PopupContent>
@@ -92,6 +93,12 @@ impl NewFireplaceComponent {
                         self.dialog_state.focus.set(DialogFocusTarget::Child(0));
                     } else if key_code == KeyCode::Up {
                         self.dialog_state.focus.set(DialogFocusTarget::Child(1));
+                    } else if is_enter(key) {
+                        let new_project = Project {
+                            name: content.name.text.clone(),
+                            directory: content.directory.text.clone().into(),
+                        };
+                        return Action::AddFireplace(new_project);
                     }
                 }
                 _ => {}
@@ -187,7 +194,6 @@ impl Component for NewFireplaceComponent {
     }
 
     fn render(&mut self, f: &mut Frame, rect: Rect) {
-            //f.render_widget(Clear, rect);
             self.render_dialog(f, rect);
     }
 }
@@ -195,6 +201,8 @@ impl Component for NewFireplaceComponent {
 #[derive(Default)]
 struct PopupContent {
     name: InputState,
+
+    // TODO: It might be nicer to have a real file picker here, rather than having to input the directory manually.
     directory: InputState,
 }
 
