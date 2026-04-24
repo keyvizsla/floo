@@ -4,22 +4,31 @@ use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use ratatui::prelude::{Color, Line, Modifier, Span, Style, Stylize, Text};
 use ratatui::widgets::Paragraph;
+use ratatui_interact::components::PopupDialog;
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
+use crate::components::new_fireplace_popup::NewFireplaceComponent;
 
 #[derive(Default)]
 pub struct StartScreen {
-    pub visible: bool,
+    creation_popup: Option<NewFireplaceComponent>
 }
+
 impl Component for StartScreen {
     fn init(&mut self) -> Result<(), ComponentCreationError> {
-        self.visible = true;
+        self.creation_popup = None;
         Ok(())
     }
 
     fn handle_events(&mut self, event: Option<Event>) -> Action {
         if event.is_none() {
             return Action::Noop;
+        }
+
+        if let Some(popup) = &mut self.creation_popup {
+            popup.handle_events(event);
+            return Action::Noop;
+
         }
 
         match event.unwrap() {
@@ -30,7 +39,11 @@ impl Component for StartScreen {
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
         match key.code {
-            KeyCode::Char('n') | KeyCode::Char('%') => Action::CreateNewFireplace,
+            KeyCode::Char('n') | KeyCode::Char('%') => {
+                self.creation_popup = Some(NewFireplaceComponent::new());
+                let _ = self.creation_popup.as_mut().unwrap().init();
+                return Action::Noop;
+            },
             KeyCode::Char('q') => Action::Quit,
             _ => Action::Noop,
         }
@@ -45,9 +58,6 @@ impl Component for StartScreen {
     }
 
     fn render(&mut self, f: &mut Frame, _: Rect) {
-        if !self.visible {
-            return;
-        }
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
@@ -89,5 +99,11 @@ impl Component for StartScreen {
         let paragraph = Paragraph::new(final_content).alignment(Alignment::Center);
 
         f.render_widget(paragraph, chunks[1]);
+
+        if let Some(popup) = &mut self.creation_popup {
+            // TODO: dont render popup on full area
+            popup.render(f, f.area());
+        }
+
     }
 }

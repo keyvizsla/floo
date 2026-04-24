@@ -12,24 +12,19 @@ use std::{
 };
 
 use crate::db_handler::get_projects;
-use crate::layout::draw;
+// use crate::layout::draw;
 use crate::{action::Action, project::Project, state::AppState};
+use crate::app::App;
 
 mod action;
 mod components;
 mod db_handler;
-mod layout;
+// mod layout;
 mod project;
 mod state;
+mod app;
 
 /// Initialize the TUI-App and return the Terminal object.
-fn init_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, io::Error> {
-    enable_raw_mode()?;
-    let mut stdout = io::stdout();
-    execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
-    let backend = CrosstermBackend::new(stdout);
-    Ok(Terminal::new(backend)?)
-}
 
 fn init_projects() -> Vec<Project> {
     match get_projects() {
@@ -56,39 +51,7 @@ fn output_shell_cmd(project: &Project, output_path: &PathBuf) -> Result<(), io::
 }
 
 fn main() -> Result<(), io::Error> {
-    let mut terminal = init_terminal()?;
-    let items = init_projects();
-
-    let output_path = env::var("FLOO_OUTPUT_FILE")
-        .ok()
-        .map(PathBuf::from)
-        .unwrap();
-
-    let mut state = AppState::new(items);
-
-    loop {
-        terminal.draw(|frame| draw(frame, &mut state))?;
-
-        match state.handle_input()? {
-            Some(Action::Quit) => {
-                break;
-            }
-            Some(Action::Pick(proj)) => {
-                let _ = output_shell_cmd(&proj, &output_path);
-                break;
-            }
-            _ => {}
-        }
-    }
-
-    // 4. Cleanup Terminal (Crucial for a usable terminal after exit)
-    disable_raw_mode()?;
-    execute!(
-        terminal.backend_mut(),
-        LeaveAlternateScreen,
-        DisableMouseCapture
-    )?;
-    terminal.show_cursor()?;
-
+    let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
+    app.run();
     Ok(())
 }
