@@ -3,7 +3,7 @@ use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::widgets::Clear;
 use ratatui_interact::components::{DialogConfig, DialogFocusTarget, DialogState, Input, InputState};
-use ratatui_interact::events::{get_char, is_backspace, is_delete, is_end, is_home};
+use ratatui_interact::events::{get_char, is_backspace, is_delete, is_end, is_enter, is_home, is_tab};
 use ratatui_interact::prelude::PopupDialog;
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
@@ -18,7 +18,9 @@ impl NewFireplaceComponent {
             dialog_state: DialogState::new(PopupContent::default()),
         }
     }
-    fn handle_dialog_content_key(&mut self, key_code: KeyCode, key: &crossterm::event::KeyEvent) {
+
+    // Return the Action that is to be performed by the containing component, e.g. the start screen
+    fn handle_dialog_content_key(&mut self, key_code: KeyCode, key: &crossterm::event::KeyEvent) -> Action {
         // Copy focus target to avoid borrow issues
         let focus_target = self.dialog_state.current_focus().cloned();
 
@@ -41,6 +43,8 @@ impl NewFireplaceComponent {
                         content.name.move_home();
                     } else if is_end(key) {
                         content.name.move_end();
+                    } else if is_tab(key) || key_code == KeyCode::Down {
+                        self.dialog_state.focus.set(DialogFocusTarget::Child(1));
                     }
                 }
                 1 => {
@@ -59,11 +63,42 @@ impl NewFireplaceComponent {
                         content.directory.move_home();
                     } else if is_end(key) {
                         content.directory.move_end();
+                    } else if is_tab(key) || key_code == KeyCode::Down {
+                        self.dialog_state.focus.set(DialogFocusTarget::Button(0));
+                    } else if key_code == KeyCode::Up {
+                        self.dialog_state.focus.set(DialogFocusTarget::Child(0));
                     }
                 }
                 _ => {}
             }
         }
+
+        if let Some(DialogFocusTarget::Button(idx)) = focus_target {
+            let content = &mut self.dialog_state.children;
+            match idx {
+                0 => {
+                    if is_tab(key) || key_code == KeyCode::Right {
+                        self.dialog_state.focus.set(DialogFocusTarget::Button(1));
+                    } else if key_code == KeyCode::Up {
+                        self.dialog_state.focus.set(DialogFocusTarget::Child(1));
+                    } else if is_enter(key) {
+                        return Action::ClosePopup;
+                    }
+                }
+                1 => {
+                    if key_code == KeyCode::Left {
+                        self.dialog_state.focus.set(DialogFocusTarget::Button(0));
+                    } else if is_tab(key) || key_code == KeyCode::Right {
+                        self.dialog_state.focus.set(DialogFocusTarget::Child(0));
+                    } else if key_code == KeyCode::Up {
+                        self.dialog_state.focus.set(DialogFocusTarget::Child(1));
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        return Action::Noop;
     }
     fn render_dialog(&mut self, f: &mut Frame, area: Rect) {
         // Compute focus states first
@@ -140,10 +175,7 @@ impl Component for NewFireplaceComponent {
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
-        self.handle_dialog_content_key(key.code, &key);
-
-        // TODO: Needs to eventually emit project creation and such
-        return Action::Noop;
+        self.handle_dialog_content_key(key.code, &key)
     }
 
     fn handle_mouse_events(&mut self, mouse: MouseEvent) -> Action {

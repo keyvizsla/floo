@@ -26,9 +26,11 @@ impl Component for StartScreen {
         }
 
         if let Some(popup) = &mut self.creation_popup {
-            popup.handle_events(event);
+            match popup.handle_events(event) {
+                Action::ClosePopup => { self.creation_popup = None },
+                _ => {},
+            }
             return Action::Noop;
-
         }
 
         match event.unwrap() {
