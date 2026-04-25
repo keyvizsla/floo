@@ -28,11 +28,12 @@ impl Component for StartScreen {
             match popup.handle_events(event) {
                 Action::ClosePopup => { self.creation_popup = None },
                 Action::AddFireplace(project) => {
-                    // TODO: handle failures in db edit
                     self.creation_popup = None;
                     return Action::AddFireplace(project);
                 }
-                _ => {},
+                _ => {
+                    return Action::Noop;
+                },
             }
             return Action::Noop;
         }

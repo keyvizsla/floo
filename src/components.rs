@@ -4,3 +4,4 @@ pub mod start_screen;
 pub mod main_screen;
 
 pub mod new_fireplace_popup;
+pub mod deletion_popup;
