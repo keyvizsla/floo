@@ -123,6 +123,9 @@ impl Component for MainScreen {
                 self.deletion_popup = Some(popup);
                 Action::Noop
             },
+            KeyCode::Enter => {
+                Action::Pick(self.selected_project())
+            }
             _ => Action::Noop,
         }
     }

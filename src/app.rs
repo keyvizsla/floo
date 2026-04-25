@@ -14,6 +14,7 @@ use crate::components::component::Component;
 use crate::components::main_screen::MainScreen;
 use crate::components::start_screen::StartScreen;
 use crate::db_handler;
+use crate::project::Project;
 
 pub struct AppCreationError {}
 pub struct App {
@@ -24,12 +25,11 @@ pub struct App {
 }
 
 impl App {
-    fn output_path() {
-        let output_path = env::var("FLOO_OUTPUT_FILE")
+    fn output_path() -> PathBuf {
+         env::var("FLOO_OUTPUT_FILE")
             .ok()
             .map(PathBuf::from)
-            .unwrap();
-
+            .unwrap()
     }
     fn init_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, io::Error> {
         enable_raw_mode()?;
@@ -45,6 +45,20 @@ impl App {
         let _ = start_screen.init();
         let main_screen = MainScreen::init_with_projects(state.projects.clone());
         Ok(App { state, terminal, start_screen, main_screen })
+    }
+
+    fn output_shell_cmd(project: &Project, output_path: &PathBuf) -> Result<(), io::Error> {
+        let mut instructions = String::new();
+
+        instructions.push_str(&format!("cd '{}'\n", project.directory.to_str().unwrap()));
+
+        let project_script_path = project.directory.join(".floo");
+        if project_script_path.exists() {
+            instructions.push_str(&format!("source '{}'\n", project_script_path.display()));
+        }
+
+        std::fs::write(output_path, instructions)?;
+        Ok(())
     }
 
     fn draw(&mut self) {
@@ -84,8 +98,14 @@ impl App {
                 self.main_screen.remove_project(&project);
                 Action::Noop
             }
+            Action::Pick(project) => {
+                let output_path = Self::output_path();
+                if let Err(e) = Self::output_shell_cmd(&project, &output_path) {
+                    eprintln!("Failed to write shell commands: {}", e);
+                }
+                return Action::Quit;
+            }
             Action::Quit => {
-                self.cleanup();
                 return Action::Quit;
             },
             _ => Action::Noop,
