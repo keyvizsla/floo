@@ -7,18 +7,20 @@ use rusqlite::fallible_iterator::FallibleIterator;
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
 use crate::components::deletion_popup::DeletionPopup;
+use crate::components::new_fireplace_popup::NewFireplaceComponent;
 use crate::project::Project;
 
 pub struct MainScreen {
     projects: Vec<Project>,
     selected_project: usize,
     deletion_popup: Option<DeletionPopup>,
+    creation_popup: Option<NewFireplaceComponent>,
 }
 
 impl MainScreen {
     pub fn init_with_projects(projects: Vec<Project>) -> Self {
         let selected_project = 0;
-        MainScreen { projects, selected_project, deletion_popup: None }
+        MainScreen { projects, selected_project, deletion_popup: None , creation_popup: None }
     }
 
     fn selected_project(&self) -> Project {
@@ -58,6 +60,20 @@ impl Component for MainScreen {
             return Action::Noop;
         }
 
+        if let Some(popup) = &mut self.creation_popup {
+            match popup.handle_events(event) {
+                Action::ClosePopup => { self.creation_popup = None },
+                Action::AddFireplace(project) => {
+                    self.creation_popup = None;
+                    return Action::AddFireplace(project);
+                }
+                _ => {
+                    return Action::Noop;
+                },
+            }
+            return Action::Noop;
+        }
+
         match event.unwrap() {
             Event::Key(e) => self.handle_key_events(e),
             _ => Action::Noop,
@@ -66,11 +82,11 @@ impl Component for MainScreen {
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
         match key.code {
-            // KeyCode::Char('n') | KeyCode::Char('%') => {
-            //     self.creation_popup = Some(NewFireplaceComponent::new());
-            //     let _ = self.creation_popup.as_mut().unwrap().init();
-            //     return Action::Noop;
-            // },
+            KeyCode::Char('n') | KeyCode::Char('%') => {
+                self.creation_popup = Some(NewFireplaceComponent::new());
+                let _ = self.creation_popup.as_mut().unwrap().init();
+                return Action::Noop;
+            },
             KeyCode::Char('q') => Action::Quit,
             KeyCode::Char('d') => {
                 let mut popup = DeletionPopup::new(self.selected_project());
@@ -136,6 +152,10 @@ impl Component for MainScreen {
 
         if let Some(deletion_popup) = &mut self.deletion_popup {
             deletion_popup.render(f, rect);
+        }
+
+        if let Some(creation_popup) = &mut self.creation_popup {
+            creation_popup.render(f, rect);
         }
     }
 }
