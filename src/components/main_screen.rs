@@ -27,12 +27,33 @@ impl MainScreen {
         self.projects[self.selected_project].clone()
     }
 
+    fn select_next_project(&mut self) {
+        self.selected_project += 1;
+        if self.selected_project >= self.projects.len() {
+            self.selected_project = 0;
+        }
+    }
+
+    fn select_previous_project(&mut self) {
+        if self.selected_project == 0 {
+            self.selected_project = self.projects.len() - 1;
+        } else {
+            self.selected_project -= 1;
+        }
+    }
+
     pub fn add_project(&mut self, project: Project) {
         self.projects.push(project);
+        self.selected_project = self.projects.len() - 1;
     }
 
     pub fn remove_project(&mut self, project: &Project) {
         self.projects.retain(|p| p.name != project.name);
+        if self.projects.len() == 0 {
+            self.selected_project = 0;
+        } else if self.selected_project >= self.projects.len() {
+            self.selected_project = self.projects.len() - 1;
+        }
     }
 }
 
@@ -82,6 +103,14 @@ impl Component for MainScreen {
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
         match key.code {
+            KeyCode::Char('j') | KeyCode::Down => {
+                self.select_next_project();
+                Action::Noop
+            },
+            KeyCode::Char('k') | KeyCode::Up => {
+                self.select_previous_project();
+                Action::Noop
+            },
             KeyCode::Char('n') | KeyCode::Char('%') => {
                 self.creation_popup = Some(NewFireplaceComponent::new());
                 let _ = self.creation_popup.as_mut().unwrap().init();

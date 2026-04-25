@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
@@ -96,7 +97,8 @@ impl NewFireplaceComponent {
                     } else if is_enter(key) {
                         let new_project = Project {
                             name: content.name.text.clone(),
-                            directory: content.directory.text.clone().into(),
+                            directory: PathBuf::from(content.directory.text.clone()).canonicalize()
+                                .unwrap_or_else(|_| PathBuf::from(content.directory.text.clone())),
                         };
                         return Action::AddFireplace(new_project);
                     }
