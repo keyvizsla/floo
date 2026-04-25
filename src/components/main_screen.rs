@@ -6,17 +6,19 @@ use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph, Wra
 use rusqlite::fallible_iterator::FallibleIterator;
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
+use crate::components::deletion_popup::DeletionPopup;
 use crate::project::Project;
 
 pub struct MainScreen {
     projects: Vec<Project>,
     selected_project: usize,
+    deletion_popup: Option<DeletionPopup>,
 }
 
 impl MainScreen {
     pub fn init_with_projects(projects: Vec<Project>) -> Self {
         let selected_project = 0;
-        MainScreen { projects, selected_project }
+        MainScreen { projects, selected_project, deletion_popup: None }
     }
 
     fn selected_project(&self) -> Project {
@@ -25,6 +27,10 @@ impl MainScreen {
 
     pub fn add_project(&mut self, project: Project) {
         self.projects.push(project);
+    }
+
+    pub fn remove_project(&mut self, project: &Project) {
+        self.projects.retain(|p| p.name != project.name);
     }
 }
 
@@ -35,6 +41,20 @@ impl Component for MainScreen {
 
     fn handle_events(&mut self, event: Option<Event>) -> Action {
         if event.is_none() {
+            return Action::Noop;
+        }
+
+        if let Some(popup) = &mut self.deletion_popup {
+            match popup.handle_events(event) {
+                Action::ClosePopup => { self.deletion_popup = None },
+                Action::DeleteFireplace(project) => {
+                    self.deletion_popup = None;
+                    return Action::DeleteFireplace(project);
+                }
+                _ => {
+                    return Action::Noop;
+                },
+            }
             return Action::Noop;
         }
 
@@ -52,6 +72,12 @@ impl Component for MainScreen {
             //     return Action::Noop;
             // },
             KeyCode::Char('q') => Action::Quit,
+            KeyCode::Char('d') => {
+                let mut popup = DeletionPopup::new(self.selected_project());
+                popup.init();
+                self.deletion_popup = Some(popup);
+                Action::Noop
+            },
             _ => Action::Noop,
         }
     }
@@ -107,5 +133,9 @@ impl Component for MainScreen {
             paragraph,
             right,
         );
+
+        if let Some(deletion_popup) = &mut self.deletion_popup {
+            deletion_popup.render(f, rect);
+        }
     }
 }

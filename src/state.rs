@@ -32,4 +32,8 @@ impl AppState {
             projects
         }
     }
+
+    pub fn remove_project(&mut self, project: &Project) {
+        self.projects.retain(|p| p.name != project.name);
+    }
 }

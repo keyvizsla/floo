@@ -67,15 +67,26 @@ impl App {
 
         match action {
             Action::AddFireplace(project) => {
-                // TODO: write project to database, not just in memory
+                // TODO: Handle errors
                 let _ = db_handler::add_project(project.clone());
                 self.state.projects.push(project.clone());
                 self.main_screen.add_project(project);
                 Action::Noop
             },
-           Action::Quit => {
+            Action::DeleteFireplace(project) => {
+                // TODO: Handle errors
+                let _ = db_handler::remove_project(project.clone());
+                self.state.remove_project(&project);
+
+                // TODO: I think it would be cleaner if the main screen itself already did this
+                // then the base app does not need to know that the main screen contains a list
+                // of projects
+                self.main_screen.remove_project(&project);
+                Action::Noop
+            }
+            Action::Quit => {
                 self.cleanup();
-               return Action::Quit;
+                return Action::Quit;
             },
             _ => Action::Noop,
         }

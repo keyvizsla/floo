@@ -58,6 +58,15 @@ pub fn add_project(project: Project) -> Result<()> {
     Ok(())
 }
 
+pub fn remove_project(project: Project) -> Result<()> {
+    let conn = get_safe_db_connection()?;
+    let mut stmt = conn.prepare(
+        "DELETE FROM projects WHERE name = ?1",
+    )?;
+    stmt.execute(params![project.name])?;
+    Ok(())
+}
+
 /// Private function to resolve the true filepath
 /// of the database based on environment configuration.
 fn db_filepath() -> PathBuf {
