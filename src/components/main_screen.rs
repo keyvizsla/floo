@@ -137,7 +137,11 @@ impl Component for MainScreen {
         Action::Noop
     }
 
-    fn update(&mut self, _action: Action) -> Action {
+    fn update(&mut self, action: Action) -> Action {
+        match action {
+            Action::DeleteFireplace(project) => self.remove_project(&project),
+            _ => {}
+        }
         Action::Noop
     }
 

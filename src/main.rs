@@ -9,6 +9,8 @@ mod db_handler;
 mod project;
 mod state;
 
+// TODO: Build cli interface
+
 fn main() -> Result<(), io::Error> {
     let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
     app.run();

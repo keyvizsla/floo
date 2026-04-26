@@ -1,20 +1,19 @@
-use std::env;
-use crate::state::AppState;
-use ratatui::{
-    Terminal,
-    backend::CrosstermBackend,
-};
-use std::io::{self, Stdout};
-use std::path::PathBuf;
-use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
-use crossterm::{event, execute};
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
 use crate::action::Action;
 use crate::components::component::Component;
 use crate::components::main_screen::MainScreen;
 use crate::components::start_screen::StartScreen;
 use crate::db_handler;
 use crate::project::Project;
+use crate::state::AppState;
+use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
+use crossterm::terminal::{
+    EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
+};
+use crossterm::{event, execute};
+use ratatui::{Terminal, backend::CrosstermBackend};
+use std::env;
+use std::io::{self, Stdout};
+use std::path::PathBuf;
 
 pub struct AppCreationError {}
 pub struct App {
@@ -26,11 +25,12 @@ pub struct App {
 
 impl App {
     fn output_path() -> PathBuf {
-         env::var("FLOO_OUTPUT_FILE")
+        env::var("FLOO_OUTPUT_FILE")
             .ok()
             .map(PathBuf::from)
             .unwrap()
     }
+
     fn init_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, io::Error> {
         enable_raw_mode()?;
         let mut stdout = io::stdout();
@@ -38,13 +38,19 @@ impl App {
         let backend = CrosstermBackend::new(stdout);
         Ok(Terminal::new(backend)?)
     }
+
     pub fn new() -> Result<Self, AppCreationError> {
         let state = AppState::init();
         let terminal = Self::init_terminal().map_err(|_| AppCreationError {})?;
         let mut start_screen = StartScreen::default();
         let _ = start_screen.init();
         let main_screen = MainScreen::init_with_projects(state.projects.clone());
-        Ok(App { state, terminal, start_screen, main_screen })
+        Ok(App {
+            state,
+            terminal,
+            start_screen,
+            main_screen,
+        })
     }
 
     fn output_shell_cmd(project: &Project, output_path: &PathBuf) -> Result<(), io::Error> {
@@ -86,16 +92,12 @@ impl App {
                 self.state.projects.push(project.clone());
                 self.main_screen.add_project(project);
                 Action::Noop
-            },
+            }
             Action::DeleteFireplace(project) => {
                 // TODO: Handle errors
                 let _ = db_handler::remove_project(project.clone());
                 self.state.remove_project(&project);
-
-                // TODO: I think it would be cleaner if the main screen itself already did this
-                // then the base app does not need to know that the main screen contains a list
-                // of projects
-                self.main_screen.remove_project(&project);
+                self.main_screen.update(Action::DeleteFireplace(project));
                 Action::Noop
             }
             Action::Pick(project) => {
@@ -107,7 +109,7 @@ impl App {
             }
             Action::Quit => {
                 return Action::Quit;
-            },
+            }
             _ => Action::Noop,
         }
     }
@@ -115,10 +117,10 @@ impl App {
     fn cleanup(&mut self) {
         let _ = disable_raw_mode();
         let _ = execute!(
-        self.terminal.backend_mut(),
-        LeaveAlternateScreen,
-        DisableMouseCapture
-    );
+            self.terminal.backend_mut(),
+            LeaveAlternateScreen,
+            DisableMouseCapture
+        );
         let _ = self.terminal.show_cursor();
     }
 
