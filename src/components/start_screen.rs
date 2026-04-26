@@ -6,7 +6,6 @@ use ratatui::widgets::Paragraph;
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
-use crate::db_handler;
 
 #[derive(Default)]
 pub struct StartScreen {
@@ -56,11 +55,11 @@ impl Component for StartScreen {
         }
     }
 
-    fn handle_mouse_events(&mut self, mouse: MouseEvent) -> Action {
+    fn handle_mouse_events(&mut self, _mouse: MouseEvent) -> Action {
         Action::Noop
     }
 
-    fn update(&mut self, action: Action) -> Action {
+    fn update(&mut self, _action: Action) -> Action {
         Action::Noop
     }
 

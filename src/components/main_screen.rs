@@ -3,7 +3,7 @@ use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect, Spacing};
 use ratatui::symbols::merge::MergeStrategy;
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph, Wrap};
-use rusqlite::fallible_iterator::FallibleIterator;
+
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
 use crate::components::deletion_popup::DeletionPopup;
@@ -20,7 +20,12 @@ pub struct MainScreen {
 impl MainScreen {
     pub fn init_with_projects(projects: Vec<Project>) -> Self {
         let selected_project = 0;
-        MainScreen { projects, selected_project, deletion_popup: None , creation_popup: None }
+        MainScreen {
+            projects,
+            selected_project,
+            deletion_popup: None,
+            creation_popup: None,
+        }
     }
 
     fn selected_project(&self) -> Project {
@@ -69,28 +74,28 @@ impl Component for MainScreen {
 
         if let Some(popup) = &mut self.deletion_popup {
             match popup.handle_events(event) {
-                Action::ClosePopup => { self.deletion_popup = None },
+                Action::ClosePopup => self.deletion_popup = None,
                 Action::DeleteFireplace(project) => {
                     self.deletion_popup = None;
                     return Action::DeleteFireplace(project);
                 }
                 _ => {
                     return Action::Noop;
-                },
+                }
             }
             return Action::Noop;
         }
 
         if let Some(popup) = &mut self.creation_popup {
             match popup.handle_events(event) {
-                Action::ClosePopup => { self.creation_popup = None },
+                Action::ClosePopup => self.creation_popup = None,
                 Action::AddFireplace(project) => {
                     self.creation_popup = None;
                     return Action::AddFireplace(project);
                 }
                 _ => {
                     return Action::Noop;
-                },
+                }
             }
             return Action::Noop;
         }
@@ -106,35 +111,33 @@ impl Component for MainScreen {
             KeyCode::Char('j') | KeyCode::Down => {
                 self.select_next_project();
                 Action::Noop
-            },
+            }
             KeyCode::Char('k') | KeyCode::Up => {
                 self.select_previous_project();
                 Action::Noop
-            },
+            }
             KeyCode::Char('n') | KeyCode::Char('%') => {
                 self.creation_popup = Some(NewFireplaceComponent::new());
                 let _ = self.creation_popup.as_mut().unwrap().init();
                 return Action::Noop;
-            },
+            }
             KeyCode::Char('q') => Action::Quit,
             KeyCode::Char('d') => {
                 let mut popup = DeletionPopup::new(self.selected_project());
-                popup.init();
+                let _ = popup.init();
                 self.deletion_popup = Some(popup);
                 Action::Noop
-            },
-            KeyCode::Enter => {
-                Action::Pick(self.selected_project())
             }
+            KeyCode::Enter => Action::Pick(self.selected_project()),
             _ => Action::Noop,
         }
     }
 
-    fn handle_mouse_events(&mut self, mouse: MouseEvent) -> Action {
+    fn handle_mouse_events(&mut self, _mouse: MouseEvent) -> Action {
         Action::Noop
     }
 
-    fn update(&mut self, action: Action) -> Action {
+    fn update(&mut self, _action: Action) -> Action {
         Action::Noop
     }
 
@@ -177,10 +180,7 @@ impl Component for MainScreen {
             )
             .wrap(Wrap { trim: false });
 
-        f.render_widget(
-            paragraph,
-            right,
-        );
+        f.render_widget(paragraph, right);
 
         if let Some(deletion_popup) = &mut self.deletion_popup {
             deletion_popup.render(f, rect);
@@ -191,3 +191,4 @@ impl Component for MainScreen {
         }
     }
 }
+

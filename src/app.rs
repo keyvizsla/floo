@@ -6,7 +6,7 @@ use ratatui::{
 };
 use std::io::{self, Stdout};
 use std::path::PathBuf;
-use crossterm::event::{DisableMouseCapture, EnableMouseCapture, Event};
+use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use crossterm::{event, execute};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
 use crate::action::Action;

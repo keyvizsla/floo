@@ -1,11 +1,6 @@
-use ratatui::widgets::ListState;
-
-use crate::action::Action;
-use crate::project::Project;
-use crossterm::event::{self, Event, KeyCode};
-use std::io::{self};
-use std::process::exit;
 use crate::db_handler::get_projects;
+use crate::project::Project;
+use std::process::exit;
 
 /// Represents the global state of the App
 #[derive(Debug, Default, Clone)]
@@ -14,11 +9,6 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn new(projects: Vec<Project>) -> Self {
-        Self {
-            projects,
-        }
-    }
     pub fn init() -> Self {
         let projects = match get_projects() {
             Ok(projects) => projects,
@@ -28,9 +18,7 @@ impl AppState {
             }
         };
 
-        Self {
-            projects
-        }
+        Self { projects }
     }
 
     pub fn remove_project(&mut self, project: &Project) {

@@ -1,10 +1,10 @@
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
-use ratatui::layout::{Constraint, Direction, Layout, Rect};
-use ratatui::widgets::{Clear, Paragraph};
-use ratatui_interact::components::{DialogConfig, DialogFocusTarget, DialogState, Input, InputState};
-use ratatui_interact::events::{get_char, is_backspace, is_delete, is_end, is_enter, is_home, is_tab};
-use ratatui_interact::prelude::{PopupDialog, SearchState};
+use ratatui::layout::Rect;
+use ratatui::widgets::Paragraph;
+use ratatui_interact::components::{DialogConfig, DialogFocusTarget, DialogState};
+use ratatui_interact::events::{is_enter, is_tab};
+use ratatui_interact::prelude::PopupDialog;
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
 use crate::project::Project;
@@ -60,7 +60,7 @@ impl DeletionPopup {
         let mut dialog = PopupDialog::new(
             &config,
             &mut self.dialog_state,
-            |frame, area, content| {
+            |frame, area, _content| {
                 Self::render_popup_content(frame, area, &text);
             },
         );
@@ -102,11 +102,11 @@ impl Component for DeletionPopup {
         self.handle_dialog_content_key(key.code, &key)
     }
 
-    fn handle_mouse_events(&mut self, mouse: MouseEvent) -> Action {
+    fn handle_mouse_events(&mut self, _mouse: MouseEvent) -> Action {
         return Action::Noop;
     }
 
-    fn update(&mut self, action: Action) -> Action {
+    fn update(&mut self, _action: Action) -> Action {
         return Action::Noop;
     }
 

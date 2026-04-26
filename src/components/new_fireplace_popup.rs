@@ -2,7 +2,6 @@ use std::path::PathBuf;
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
-use ratatui::widgets::Clear;
 use ratatui_interact::components::{DialogConfig, DialogFocusTarget, DialogState, Input, InputState};
 use ratatui_interact::events::{get_char, is_backspace, is_delete, is_end, is_enter, is_home, is_tab};
 use ratatui_interact::prelude::PopupDialog;
@@ -151,11 +150,11 @@ impl NewFireplaceComponent {
 
         content.name.focused = focus_states[0];
         let input = Input::new(&content.name).label("Fireplace Name");
-        let region = input.render_stateful(f, chunks[0]);
+        let _region = input.render_stateful(f, chunks[0]);
 
         content.directory.focused = focus_states[1];
         let input = Input::new(&content.directory).label("Path to Fireplace");
-        let region = input.render_stateful(f, chunks[1]);
+        let _region = input.render_stateful(f, chunks[1]);
     }
 }
 
@@ -187,11 +186,11 @@ impl Component for NewFireplaceComponent {
         self.handle_dialog_content_key(key.code, &key)
     }
 
-    fn handle_mouse_events(&mut self, mouse: MouseEvent) -> Action {
+    fn handle_mouse_events(&mut self, _mouse: MouseEvent) -> Action {
         return Action::Noop;
     }
 
-    fn update(&mut self, action: Action) -> Action {
+    fn update(&mut self, _action: Action) -> Action {
         return Action::Noop;
     }
 

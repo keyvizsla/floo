@@ -1,12 +1,10 @@
-use ratatui::crossterm::event::{Event, KeyEvent, MouseEvent};
 use ratatui::Frame;
+use ratatui::crossterm::event::{Event, KeyEvent, MouseEvent};
 use ratatui::layout::Rect;
 
 use crate::action::Action;
 
-pub enum ComponentCreationError {
-    Generic,
-}
+pub struct ComponentCreationError {}
 
 pub trait Component {
     fn init(&mut self) -> Result<(), ComponentCreationError>;
