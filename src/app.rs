@@ -1,7 +1,6 @@
 use crate::action::Action;
 use crate::components::component::Component;
-use crate::components::main_screen::MainScreen;
-use crate::components::start_screen::StartScreen;
+use crate::components::tui::Tui;
 use crate::db_handler;
 use crate::project::Project;
 use crate::state::AppState;
@@ -19,8 +18,7 @@ pub struct AppCreationError {}
 pub struct App {
     state: AppState,
     terminal: Terminal<CrosstermBackend<Stdout>>,
-    start_screen: StartScreen,
-    main_screen: MainScreen,
+    tui: Tui,
 }
 
 impl App {
@@ -42,14 +40,12 @@ impl App {
     pub fn new() -> Result<Self, AppCreationError> {
         let state = AppState::init();
         let terminal = Self::init_terminal().map_err(|_| AppCreationError {})?;
-        let mut start_screen = StartScreen::default();
-        let _ = start_screen.init();
-        let main_screen = MainScreen::init_with_projects(state.projects.clone());
+        let mut tui = Tui::new(state.projects.clone());
+        let _ = tui.init();
         Ok(App {
             state,
             terminal,
-            start_screen,
-            main_screen,
+            tui,
         })
     }
 
@@ -68,50 +64,9 @@ impl App {
     }
 
     fn draw(&mut self) {
-        let _ = self.terminal.draw(|frame| {
-            if self.state.projects.len() > 0 {
-                self.main_screen.render(frame, frame.area());
-            } else {
-                self.start_screen.render(frame, frame.area());
-            }
-        });
-    }
-
-    // TODO: This kind of motivates having a base tui component instead of rendering in App
-    fn handle_events(&mut self) -> Action {
-        let action = if self.state.projects.len() > 0 {
-            self.main_screen.handle_events(event::read().ok())
-        } else {
-            self.start_screen.handle_events(event::read().ok())
-        };
-
-        match action {
-            Action::AddFireplace(project) => {
-                // TODO: Handle errors
-                let _ = db_handler::add_project(project.clone());
-                self.state.projects.push(project.clone());
-                self.main_screen.add_project(project);
-                Action::Noop
-            }
-            Action::DeleteFireplace(project) => {
-                // TODO: Handle errors
-                let _ = db_handler::remove_project(project.clone());
-                self.state.remove_project(&project);
-                self.main_screen.update(Action::DeleteFireplace(project));
-                Action::Noop
-            }
-            Action::Pick(project) => {
-                let output_path = Self::output_path();
-                if let Err(e) = Self::output_shell_cmd(&project, &output_path) {
-                    eprintln!("Failed to write shell commands: {}", e);
-                }
-                return Action::Quit;
-            }
-            Action::Quit => {
-                return Action::Quit;
-            }
-            _ => Action::Noop,
-        }
+        let _ = self
+            .terminal
+            .draw(|frame| self.tui.render(frame, frame.area()));
     }
 
     fn cleanup(&mut self) {
@@ -127,11 +82,30 @@ impl App {
     pub fn run(&mut self) {
         loop {
             self.draw();
-            let action = self.handle_events();
-            if let Action::Quit = action {
-                break;
+            let action = self.tui.handle_events(event::read().ok());
+            match action.clone() {
+                Action::Quit => {
+                    self.cleanup();
+                    return;
+                }
+                Action::Pick(project) => {
+                    let _ = Self::output_shell_cmd(&project, &Self::output_path());
+                    self.cleanup();
+                    return;
+                }
+                Action::AddFireplace(project) => {
+                    // TODO: If db write not successful, show an error popup
+                    let _ = db_handler::add_project(project.clone());
+                    self.state.projects.push(project.clone());
+                }
+                Action::DeleteFireplace(project) => {
+                    // TODO: If db write not successful, show an error popup
+                    let _ = db_handler::remove_project(project.clone());
+                    self.state.remove_project(&project);
+                }
+                _ => {}
             }
+            self.tui.update(action);
         }
-        self.cleanup();
     }
 }

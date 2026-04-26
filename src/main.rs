@@ -8,6 +8,7 @@ mod components;
 mod db_handler;
 mod project;
 mod state;
+mod utils;
 
 // TODO: Build cli interface
 

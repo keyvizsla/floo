@@ -9,7 +9,9 @@ use crate::components::component::{Component, ComponentCreationError};
 use crate::components::deletion_popup::DeletionPopup;
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
 use crate::project::Project;
+use crate::utils::remove_project;
 
+#[derive(Default)]
 pub struct MainScreen {
     projects: Vec<Project>,
     selected_project: usize,
@@ -53,7 +55,7 @@ impl MainScreen {
     }
 
     pub fn remove_project(&mut self, project: &Project) {
-        self.projects.retain(|p| p.name != project.name);
+        remove_project(&mut self.projects, project);
         if self.projects.len() == 0 {
             self.selected_project = 0;
         } else if self.selected_project >= self.projects.len() {
@@ -139,6 +141,7 @@ impl Component for MainScreen {
 
     fn update(&mut self, action: Action) -> Action {
         match action {
+            Action::AddFireplace(project) => self.add_project(project),
             Action::DeleteFireplace(project) => self.remove_project(&project),
             _ => {}
         }
@@ -195,4 +198,3 @@ impl Component for MainScreen {
         }
     }
 }
-

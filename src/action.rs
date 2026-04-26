@@ -1,5 +1,6 @@
 use crate::project::Project;
 
+#[derive(Clone)]
 pub enum Action {
     Quit,
     AddFireplace(Project),

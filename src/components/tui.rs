@@ -1,0 +1,77 @@
+use crossterm::event::{Event, KeyEvent, MouseEvent};
+use ratatui::{Frame, layout::Rect};
+
+use crate::{
+    action::Action,
+    components::{
+        component::{Component, ComponentCreationError},
+        main_screen::MainScreen,
+        start_screen::StartScreen,
+    },
+    project::Project,
+    utils::remove_project,
+};
+
+#[derive(Default)]
+pub struct Tui {
+    projects: Vec<Project>,
+    start_screen: StartScreen,
+    main_screen: MainScreen,
+}
+
+impl Tui {
+    pub fn new(projects: Vec<Project>) -> Self {
+        Self {
+            projects,
+            ..Default::default()
+        }
+    }
+}
+
+impl Component for Tui {
+    fn init(&mut self) -> Result<(), ComponentCreationError> {
+        self.main_screen = MainScreen::init_with_projects(self.projects.clone());
+        self.main_screen.init()?;
+        self.start_screen.init()?;
+        Ok(())
+    }
+
+    fn handle_events(&mut self, event: Option<Event>) -> Action {
+        // For now the base tui has to do no own handling
+        // it just passes events up to the base app
+        if self.projects.len() > 0 {
+            self.main_screen.handle_events(event)
+        } else {
+            self.start_screen.handle_events(event)
+        }
+    }
+
+    fn handle_key_events(&mut self, _: KeyEvent) -> Action {
+        // This should never be called normally
+        Action::Noop
+    }
+
+    fn handle_mouse_events(&mut self, _: MouseEvent) -> crate::action::Action {
+        // This should never be called normally
+        Action::Noop
+    }
+
+    fn update(&mut self, action: Action) -> Action {
+        match action.clone() {
+            Action::AddFireplace(project) => self.projects.push(project),
+            Action::DeleteFireplace(project) => remove_project(&mut self.projects, &project),
+            _ => {}
+        }
+        self.main_screen.update(action.clone());
+        self.start_screen.update(action);
+        Action::Noop
+    }
+
+    fn render(&mut self, f: &mut Frame, rect: Rect) {
+        if self.projects.len() > 0 {
+            self.main_screen.render(f, rect);
+        } else {
+            self.start_screen.render(f, rect);
+        }
+    }
+}
