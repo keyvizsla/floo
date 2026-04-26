@@ -10,5 +10,6 @@ path = "src/main.rs"
 [dependencies]
 crossterm = "0.29.0"
 ratatui = "0.30.0"
+ratatui-interact = "0.5.3"
 rusqlite = "0.39.0"
 tui-markdown = "0.3.7"

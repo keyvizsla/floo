@@ -1,7 +1,7 @@
 use std::env;
 use std::path::PathBuf;
 
-use rusqlite::{Connection, Result};
+use rusqlite::{params, Connection, Result};
 
 use crate::project::Project;
 
@@ -47,6 +47,24 @@ pub fn get_projects() -> Result<Vec<Project>> {
     conn.close().map_err(|(_, err)| err)?;
 
     Ok(projects)
+}
+
+pub fn add_project(project: Project) -> Result<()> {
+    let conn = get_safe_db_connection()?;
+    let mut stmt = conn.prepare(
+        "INSERT INTO projects (name, directory) VALUES (?1, ?2)",
+    )?;
+    stmt.execute(params![project.name, project.directory.to_str()])?;
+    Ok(())
+}
+
+pub fn remove_project(project: Project) -> Result<()> {
+    let conn = get_safe_db_connection()?;
+    let mut stmt = conn.prepare(
+        "DELETE FROM projects WHERE name = ?1",
+    )?;
+    stmt.execute(params![project.name])?;
+    Ok(())
 }
 
 /// Private function to resolve the true filepath
