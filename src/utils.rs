@@ -5,3 +5,26 @@ use crate::project::Project;
 pub fn remove_project(projects: &mut Vec<Project>, project_to_delete: &Project) {
     projects.retain(|p| p.name != project_to_delete.name);
 }
+
+/// Outputs the floo shell wrapper function.
+/// Should only be used by the installer.
+pub fn init_sys() {
+    let shell_wrapper = r#"
+floo() {
+    local tmp_file
+    tmp_file="$(mktemp)"
+    export FLOO_OUTPUT_FILE="$tmp_file"
+
+    command floo-bin "$@"
+
+    if [ -s "$tmp_file" ]; then
+        . "$tmp_file"
+    fi
+
+    rm -f "$tmp_file"
+    unset FLOO_OUTPUT_FILE
+}
+"#;
+
+    println!("{}", shell_wrapper);
+}
