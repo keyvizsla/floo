@@ -34,14 +34,8 @@ impl HelpPopup {
     }
 
     fn render_dialog(&mut self, f: &mut Frame, area: Rect) {
-        let content_height: u16 = (self.content_state.line_count() + 4).try_into().unwrap();
-        let max_height = if area.height < content_height {
-            area.height
-        } else {
-            content_height
-        };
         let config = DialogConfig::new("Help - Exit with `q`")
-            .max_size(area.width, max_height as u16)
+            .max_size(area.width, self.height(area))
             .no_buttons();
         let mut dialog =
             PopupDialog::new(&config, &mut self.dialog_state, |frame, area, _content| {
@@ -49,6 +43,15 @@ impl HelpPopup {
                 frame.render_widget(text_elem, area);
             });
         dialog.render(f);
+    }
+
+    fn height(&self, area: Rect) -> u16 {
+        let content_height: u16 = (self.content_state.line_count() + 4).try_into().unwrap();
+        if area.height < content_height {
+            area.height
+        } else {
+            content_height
+        }
     }
 }
 

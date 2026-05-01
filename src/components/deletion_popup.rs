@@ -1,3 +1,7 @@
+use crate::action::Action;
+use crate::components::component::{Component, ComponentCreationError};
+use crate::project::Project;
+use crate::utils::longest_line;
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
 use ratatui::layout::Rect;
@@ -5,9 +9,6 @@ use ratatui::widgets::Paragraph;
 use ratatui_interact::components::{DialogConfig, DialogFocusTarget, DialogState};
 use ratatui_interact::events::{is_enter, is_tab};
 use ratatui_interact::prelude::PopupDialog;
-use crate::action::Action;
-use crate::components::component::{Component, ComponentCreationError};
-use crate::project::Project;
 
 pub struct DeletionPopup {
     dialog_state: DialogState<PopupContent>,
@@ -23,10 +24,17 @@ impl DeletionPopup {
     }
 
     fn popup_text(&self) -> String {
-        format!("Are you sure you want to delete the fireplace \"{}\"?", self.target_project.name)
+        format!(
+            "Are you sure you want to delete the fireplace \"{}\"?",
+            self.target_project.name
+        )
     }
 
-    fn handle_dialog_content_key(&mut self, key_code: KeyCode, key: &crossterm::event::KeyEvent) -> Action {
+    fn handle_dialog_content_key(
+        &mut self,
+        key_code: KeyCode,
+        key: &crossterm::event::KeyEvent,
+    ) -> Action {
         // Copy focus target to avoid borrow issues
         let focus_target = self.dialog_state.current_focus().cloned();
 
@@ -52,26 +60,38 @@ impl DeletionPopup {
 
         return Action::Noop;
     }
+
+    fn height(&self, area: Rect) -> u16 {
+        let required_height = 6;
+        if area.height < required_height {
+            area.height
+        } else {
+            required_height
+        }
+    }
+
+    fn width(&self, area: Rect) -> u16 {
+        let required_width = 2 + longest_line(&self.popup_text()) as u16;
+        if area.width < required_width {
+            area.height
+        } else {
+            required_width
+        }
+    }
+
     fn render_dialog(&mut self, f: &mut Frame, area: Rect) {
-        let config = DialogConfig::new("Delete Fireplace")
-            .max_size(area.width, area.height)
-            .ok_cancel();
         let text = self.popup_text();
-        let mut dialog = PopupDialog::new(
-            &config,
-            &mut self.dialog_state,
-            |frame, area, _content| {
+        let config = DialogConfig::new("Delete Fireplace")
+            .max_size(self.width(area), self.height(area))
+            .yes_no();
+        let mut dialog =
+            PopupDialog::new(&config, &mut self.dialog_state, |frame, area, _content| {
                 Self::render_popup_content(frame, area, &text);
-            },
-        );
+            });
         dialog.render(f);
     }
 
-    fn render_popup_content(
-        f: &mut Frame,
-        area: Rect,
-        text: &str,
-    ) {
+    fn render_popup_content(f: &mut Frame, area: Rect, text: &str) {
         let text = Paragraph::new(text).wrap(ratatui::widgets::Wrap { trim: true });
         f.render_widget(text, area);
     }
@@ -117,3 +137,4 @@ impl Component for DeletionPopup {
 
 #[derive(Default)]
 struct PopupContent {}
+
