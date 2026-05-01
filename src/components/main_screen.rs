@@ -7,6 +7,7 @@ use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph, Wra
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
 use crate::components::deletion_popup::DeletionPopup;
+use crate::components::help_popup::HelpPopup;
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
 use crate::project::Project;
 use crate::utils::remove_project;
@@ -17,6 +18,7 @@ pub struct MainScreen {
     selected_project: usize,
     deletion_popup: Option<DeletionPopup>,
     creation_popup: Option<NewFireplaceComponent>,
+    help_popup: Option<HelpPopup>,
 }
 
 impl MainScreen {
@@ -27,6 +29,7 @@ impl MainScreen {
             selected_project,
             deletion_popup: None,
             creation_popup: None,
+            help_popup: None,
         }
     }
 
@@ -102,6 +105,16 @@ impl Component for MainScreen {
             return Action::Noop;
         }
 
+        if let Some(popup) = &mut self.help_popup {
+            match popup.handle_events(event) {
+                Action::ClosePopup => self.help_popup = None,
+                _ => {
+                    return Action::Noop;
+                }
+            }
+            return Action::Noop;
+        }
+
         match event.unwrap() {
             Event::Key(e) => self.handle_key_events(e),
             _ => Action::Noop,
@@ -128,6 +141,12 @@ impl Component for MainScreen {
                 let mut popup = DeletionPopup::new(self.selected_project());
                 let _ = popup.init();
                 self.deletion_popup = Some(popup);
+                Action::Noop
+            }
+            KeyCode::Char('h') => {
+                let mut popup = HelpPopup::new();
+                let _ = popup.init();
+                self.help_popup = Some(popup);
                 Action::Noop
             }
             KeyCode::Enter => Action::Pick(self.selected_project()),
@@ -158,7 +177,7 @@ impl Component for MainScreen {
         let list = List::new(list_items)
             .block(
                 Block::default()
-                    .title(" Select an Item (j/k or Arrows) ")
+                    .title(" Select an Item (press `h` for help) ")
                     .borders(Borders::ALL)
                     .merge_borders(MergeStrategy::Exact),
             )
@@ -195,6 +214,10 @@ impl Component for MainScreen {
 
         if let Some(creation_popup) = &mut self.creation_popup {
             creation_popup.render(f, rect);
+        }
+
+        if let Some(help_popup) = &mut self.help_popup {
+            help_popup.render(f, rect);
         }
     }
 }
