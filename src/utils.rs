@@ -28,3 +28,16 @@ floo() {
 
     println!("{}", shell_wrapper);
 }
+
+/// Return the length (number of characters)
+/// of the longest line in the string.
+pub fn longest_line(text: &str) -> usize {
+    let mut max: usize = 0;
+    for line in text.lines() {
+        let length = line.len();
+        if length > max {
+            max = length;
+        }
+    }
+    max
+}

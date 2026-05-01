@@ -1,16 +1,20 @@
-use std::path::PathBuf;
-use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
-use ratatui::Frame;
-use ratatui::layout::{Constraint, Direction, Layout, Rect};
-use ratatui_interact::components::{DialogConfig, DialogFocusTarget, DialogState, Input, InputState};
-use ratatui_interact::events::{get_char, is_backspace, is_delete, is_end, is_enter, is_home, is_tab};
-use ratatui_interact::prelude::PopupDialog;
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
 use crate::project::Project;
+use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
+use ratatui::Frame;
+use ratatui::layout::{Constraint, Direction, Layout, Rect};
+use ratatui_interact::components::{
+    DialogConfig, DialogFocusTarget, DialogState, Input, InputState,
+};
+use ratatui_interact::events::{
+    get_char, is_backspace, is_delete, is_end, is_enter, is_home, is_tab,
+};
+use ratatui_interact::prelude::PopupDialog;
+use std::path::PathBuf;
 
 pub struct NewFireplaceComponent {
-    dialog_state: DialogState<PopupContent>
+    dialog_state: DialogState<PopupContent>,
 }
 
 impl NewFireplaceComponent {
@@ -21,7 +25,11 @@ impl NewFireplaceComponent {
     }
 
     // Return the Action that is to be performed by the containing component, e.g. the start screen
-    fn handle_dialog_content_key(&mut self, key_code: KeyCode, key: &crossterm::event::KeyEvent) -> Action {
+    fn handle_dialog_content_key(
+        &mut self,
+        key_code: KeyCode,
+        key: &crossterm::event::KeyEvent,
+    ) -> Action {
         // Copy focus target to avoid borrow issues
         let focus_target = self.dialog_state.current_focus().cloned();
 
@@ -96,7 +104,8 @@ impl NewFireplaceComponent {
                     } else if is_enter(key) {
                         let new_project = Project {
                             name: content.name.text.clone(),
-                            directory: PathBuf::from(content.directory.text.clone()).canonicalize()
+                            directory: PathBuf::from(content.directory.text.clone())
+                                .canonicalize()
                                 .unwrap_or_else(|_| PathBuf::from(content.directory.text.clone())),
                         };
                         return Action::AddFireplace(new_project);
@@ -119,16 +128,20 @@ impl NewFireplaceComponent {
                 .is_focused(&DialogFocusTarget::Child(1)),
         ];
 
+        let required_height = 12;
+        let max_height = if area.height < required_height {
+            area.height
+        } else {
+            required_height
+        };
+
         let config = DialogConfig::new("Create New Fireplace")
-            .max_size(area.width, area.height)
+            .max_size(area.width, max_height)
             .ok_cancel();
-        let mut dialog = PopupDialog::new(
-            &config,
-            &mut self.dialog_state,
-            |frame, area, content| {
+        let mut dialog =
+            PopupDialog::new(&config, &mut self.dialog_state, |frame, area, content| {
                 Self::render_settings_content(frame, area, content, &focus_states);
-            },
-        );
+            });
         dialog.render(f);
     }
 
@@ -195,7 +208,7 @@ impl Component for NewFireplaceComponent {
     }
 
     fn render(&mut self, f: &mut Frame, rect: Rect) {
-            self.render_dialog(f, rect);
+        self.render_dialog(f, rect);
     }
 }
 
@@ -212,3 +225,4 @@ impl PopupContent {
         2
     }
 }
+
