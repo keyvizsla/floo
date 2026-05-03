@@ -1,15 +1,15 @@
+use crate::action::Action;
+use crate::components::component::{Component, ComponentCreationError};
+use crate::components::new_fireplace_popup::NewFireplaceComponent;
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use ratatui::prelude::{Color, Line, Modifier, Span, Style, Stylize, Text};
 use ratatui::widgets::Paragraph;
-use crate::action::Action;
-use crate::components::component::{Component, ComponentCreationError};
-use crate::components::new_fireplace_popup::NewFireplaceComponent;
 
 #[derive(Default)]
 pub struct StartScreen {
-    creation_popup: Option<NewFireplaceComponent>
+    creation_popup: Option<NewFireplaceComponent>,
 }
 
 impl Component for StartScreen {
@@ -25,14 +25,14 @@ impl Component for StartScreen {
 
         if let Some(popup) = &mut self.creation_popup {
             match popup.handle_events(event) {
-                Action::ClosePopup => { self.creation_popup = None },
+                Action::ClosePopup => self.creation_popup = None,
                 Action::AddFireplace(project) => {
                     self.creation_popup = None;
                     return Action::AddFireplace(project);
                 }
                 _ => {
                     return Action::Noop;
-                },
+                }
             }
             return Action::Noop;
         }
@@ -49,7 +49,7 @@ impl Component for StartScreen {
                 self.creation_popup = Some(NewFireplaceComponent::new());
                 let _ = self.creation_popup.as_mut().unwrap().init();
                 return Action::Noop;
-            },
+            }
             KeyCode::Char('q') => Action::Quit,
             _ => Action::Noop,
         }
@@ -59,7 +59,17 @@ impl Component for StartScreen {
         Action::Noop
     }
 
-    fn update(&mut self, _action: Action) -> Action {
+    fn update(&mut self, action: Action) -> Action {
+        match action {
+            Action::OpenCreationPopup(project) => {
+                self.creation_popup = match project {
+                    Some(p) => Some(NewFireplaceComponent::with_prefill(p)),
+                    None => Some(NewFireplaceComponent::new()),
+                };
+                let _ = self.creation_popup.as_mut().unwrap().init();
+            }
+            _ => {}
+        }
         Action::Noop
     }
 
@@ -87,14 +97,15 @@ impl Component for StartScreen {
                 .add_modifier(Modifier::ITALIC),
         );
 
-        let status_line = Line::from("Your floo network is dark, no fireplaces are connected.").bold();
+        let status_line =
+            Line::from("Your floo network is dark, no fireplaces are connected.").bold();
         let hint_line = Line::from(vec![
             Span::raw("To add a destination, press "),
             Span::styled("n", Style::default().bold().fg(Color::LightCyan)),
             Span::raw(" or "),
             Span::styled("%", Style::default().bold().fg(Color::LightCyan)),
         ])
-            .fg(Color::DarkGray);
+        .fg(Color::DarkGray);
 
         let mut final_content = Text::from(ascii_logo);
         final_content.lines.push(Line::from(version_hint));
@@ -110,6 +121,6 @@ impl Component for StartScreen {
             // TODO: dont render popup on full area
             popup.render(f, f.area());
         }
-
     }
 }
+

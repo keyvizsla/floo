@@ -24,6 +24,15 @@ impl NewFireplaceComponent {
         }
     }
 
+    pub fn with_prefill(project: Project) -> Self {
+        let mut popup_content = PopupContent::default();
+        popup_content.name.text = project.name;
+        popup_content.directory.text = project.directory.to_str().unwrap().to_string();
+        Self {
+            dialog_state: DialogState::new(popup_content),
+        }
+    }
+
     // Return the Action that is to be performed by the containing component, e.g. the start screen
     fn handle_dialog_content_key(
         &mut self,

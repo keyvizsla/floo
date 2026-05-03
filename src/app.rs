@@ -79,6 +79,14 @@ impl App {
         let _ = self.terminal.show_cursor();
     }
 
+    /// Start the TUI with an open, prefilled fireplace
+    /// creation popup. This should be called when `floo create`
+    /// is ran.
+    pub fn run_with_prefilled_popup(&mut self, prefill: Option<Project>) {
+        self.tui.update(Action::OpenCreationPopup(prefill));
+        self.run();
+    }
+
     pub fn run(&mut self) {
         loop {
             self.draw();
