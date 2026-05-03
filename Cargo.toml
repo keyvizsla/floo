@@ -11,6 +11,6 @@ path = "src/main.rs"
 clap = { version = "4.6.1", features = ["derive"] }
 crossterm = "0.29.0"
 ratatui = "0.30.0"
-ratatui-interact = "0.5.3"
+ratatui-interact = { version = "0.5.3", features = ["markdown"] }
 rusqlite = { version = "0.39.0", features = ["bundled"] }
 tui-markdown = "0.3.7"

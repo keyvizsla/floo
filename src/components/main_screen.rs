@@ -1,8 +1,9 @@
-use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
+use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent};
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect, Spacing};
 use ratatui::symbols::merge::MergeStrategy;
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph, Wrap};
+use ratatui_interact::utils::render_markdown_to_lines;
 
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
@@ -16,6 +17,7 @@ use crate::utils::remove_project;
 pub struct MainScreen {
     projects: Vec<Project>,
     selected_project: usize,
+    description_scroll: u16,
     deletion_popup: Option<DeletionPopup>,
     creation_popup: Option<NewFireplaceComponent>,
     help_popup: Option<HelpPopup>,
@@ -27,6 +29,7 @@ impl MainScreen {
         MainScreen {
             projects,
             selected_project,
+            description_scroll: 0,
             deletion_popup: None,
             creation_popup: None,
             help_popup: None,
@@ -122,6 +125,18 @@ impl Component for MainScreen {
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
+        if key.modifiers == KeyModifiers::CONTROL {
+            if let KeyCode::Char('d') = key.code {
+                self.description_scroll += 5;
+                return Action::Noop;
+            }
+            if let KeyCode::Char('u') = key.code {
+                if self.description_scroll >= 5 {
+                    self.description_scroll -= 5;
+                }
+                return Action::Noop;
+            }
+        }
         match key.code {
             KeyCode::Char('j') | KeyCode::Down => {
                 self.select_next_project();
@@ -203,9 +218,10 @@ impl Component for MainScreen {
             .get_description()
             .unwrap_or_else(|| "No description available.".to_string());
 
-        let parsed_text = tui_markdown::from_str(raw_project_description.as_str());
+        let parsed_text = render_markdown_to_lines(raw_project_description.as_str());
 
         let paragraph = Paragraph::new(parsed_text)
+            .scroll((self.description_scroll, 0))
             .block(
                 Block::bordered()
                     .title("Project Description")
