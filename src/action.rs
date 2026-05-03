@@ -6,6 +6,7 @@ pub enum Action {
     AddFireplace(Project),
     DeleteFireplace(Project),
     Pick(Project),
+    OpenCreationPopup(Option<Project>),
     ClosePopup,
     Noop,
 }

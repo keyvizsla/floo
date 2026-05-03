@@ -24,6 +24,15 @@ impl NewFireplaceComponent {
         }
     }
 
+    pub fn with_prefill(project: Project) -> Self {
+        let mut popup_content = PopupContent::default();
+        popup_content.name.text = project.name;
+        popup_content.directory.text = project.directory.to_str().unwrap().to_string();
+        Self {
+            dialog_state: DialogState::new(popup_content),
+        }
+    }
+
     // Return the Action that is to be performed by the containing component, e.g. the start screen
     fn handle_dialog_content_key(
         &mut self,
@@ -37,7 +46,6 @@ impl NewFireplaceComponent {
             let content = &mut self.dialog_state.children;
             match idx {
                 0 => {
-                    // Username input
                     if let Some(c) = get_char(key) {
                         content.name.insert_char(c);
                     } else if is_backspace(key) {
@@ -57,7 +65,6 @@ impl NewFireplaceComponent {
                     }
                 }
                 1 => {
-                    // Email input
                     if let Some(c) = get_char(key) {
                         content.directory.insert_char(c);
                     } else if is_backspace(key) {
@@ -118,7 +125,6 @@ impl NewFireplaceComponent {
         return Action::Noop;
     }
     fn render_dialog(&mut self, f: &mut Frame, area: Rect) {
-        // Compute focus states first
         let focus_states = [
             self.dialog_state
                 .focus
@@ -135,29 +141,28 @@ impl NewFireplaceComponent {
             required_height
         };
 
-        let config = DialogConfig::new("Create New Fireplace")
+        let config = DialogConfig::new("Create a new Fireplace")
             .max_size(area.width, max_height)
             .ok_cancel();
         let mut dialog =
             PopupDialog::new(&config, &mut self.dialog_state, |frame, area, content| {
-                Self::render_settings_content(frame, area, content, &focus_states);
+                Self::render_popup_content(frame, area, content, &focus_states);
             });
         dialog.render(f);
     }
 
-    fn render_settings_content(
+    fn render_popup_content(
         f: &mut Frame,
         area: Rect,
         content: &mut PopupContent,
         focus_states: &[bool; 2],
     ) {
-        // Layout: inputs then checkboxes
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
-                Constraint::Length(3), // Username
-                Constraint::Length(3), // Email
-                Constraint::Min(0),    // Remaining space
+                Constraint::Length(3), // Fireplace name
+                Constraint::Length(3), // Directory
+                Constraint::Min(0),    // Confirmation buttons
             ])
             .split(area);
 
@@ -225,4 +230,3 @@ impl PopupContent {
         2
     }
 }
-

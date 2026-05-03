@@ -162,6 +162,13 @@ impl Component for MainScreen {
         match action {
             Action::AddFireplace(project) => self.add_project(project),
             Action::DeleteFireplace(project) => self.remove_project(&project),
+            Action::OpenCreationPopup(project) => {
+                self.creation_popup = match project {
+                    Some(p) => Some(NewFireplaceComponent::with_prefill(p)),
+                    None => Some(NewFireplaceComponent::new()),
+                };
+                let _ = self.creation_popup.as_mut().unwrap().init();
+            }
             _ => {}
         }
         Action::Noop

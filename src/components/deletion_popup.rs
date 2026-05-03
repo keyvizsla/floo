@@ -73,7 +73,7 @@ impl DeletionPopup {
     fn width(&self, area: Rect) -> u16 {
         let required_width = 2 + longest_line(&self.popup_text()) as u16;
         if area.width < required_width {
-            area.height
+            area.width
         } else {
             required_width
         }
@@ -137,4 +137,3 @@ impl Component for DeletionPopup {
 
 #[derive(Default)]
 struct PopupContent {}
-

@@ -1,7 +1,10 @@
 use clap::{Parser, Subcommand};
-use std::io::{self};
+use std::{
+    io::{self},
+    path::PathBuf,
+};
 
-use crate::{app::App, utils::init_sys};
+use crate::{app::App, project::Project, utils::init_sys};
 
 mod action;
 mod app;
@@ -12,8 +15,8 @@ mod state;
 mod utils;
 
 #[derive(Parser)]
-#[command(name = "mytool")]
-#[command(about = "A versatile CLI tool", long_about = None)]
+#[command(name = "FLOO")]
+#[command(about = "TODO: Write about section", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Command>,
@@ -22,6 +25,10 @@ struct Cli {
 #[derive(Subcommand)]
 enum Command {
     Init,
+    Create {
+        #[arg(default_value = ".")]
+        path: PathBuf,
+    },
 }
 
 fn main() -> Result<(), io::Error> {
@@ -29,6 +36,13 @@ fn main() -> Result<(), io::Error> {
     match &cli.command {
         Some(Command::Init) => {
             init_sys();
+            Ok(())
+        }
+        Some(Command::Create { path }) => {
+            let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
+            let mut prefill = Project::default();
+            prefill.directory = path.canonicalize()?;
+            app.run_with_prefilled_popup(Some(prefill));
             Ok(())
         }
         None => {
