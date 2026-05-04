@@ -1,7 +1,7 @@
 use std::env;
 use std::path::PathBuf;
 
-use rusqlite::{params, Connection, Result};
+use rusqlite::{Connection, Result, params};
 
 use crate::project::Project;
 
@@ -16,7 +16,8 @@ pub fn get_safe_db_connection() -> Result<Connection> {
         create table if not exists projects (
             id integer primary key,
             name text not null unique,
-            directory text not null unique
+            directory text not null unique,
+            notes text
         )",
         (),
     )?;
@@ -30,7 +31,7 @@ pub fn get_projects() -> Result<Vec<Project>> {
 
     let projects = {
         let mut stmt = conn.prepare(
-            "SELECT name, directory
+            "SELECT name, directory, notes
          FROM projects;",
         )?;
 
@@ -38,6 +39,7 @@ pub fn get_projects() -> Result<Vec<Project>> {
             Ok(Project {
                 name: row.get::<usize, String>(0)?,
                 directory: row.get::<usize, String>(1)?.into(),
+                notes: row.get::<usize, String>(2)?.into(),
             })
         })?;
 
@@ -51,18 +53,19 @@ pub fn get_projects() -> Result<Vec<Project>> {
 
 pub fn add_project(project: Project) -> Result<()> {
     let conn = get_safe_db_connection()?;
-    let mut stmt = conn.prepare(
-        "INSERT INTO projects (name, directory) VALUES (?1, ?2)",
-    )?;
-    stmt.execute(params![project.name, project.directory.to_str()])?;
+    let mut stmt =
+        conn.prepare("INSERT INTO projects (name, directory, notes) VALUES (?1, ?2, ?3)")?;
+    stmt.execute(params![
+        project.name,
+        project.directory.to_str(),
+        project.notes
+    ])?;
     Ok(())
 }
 
 pub fn remove_project(project: Project) -> Result<()> {
     let conn = get_safe_db_connection()?;
-    let mut stmt = conn.prepare(
-        "DELETE FROM projects WHERE name = ?1",
-    )?;
+    let mut stmt = conn.prepare("DELETE FROM projects WHERE name = ?1")?;
     stmt.execute(params![project.name])?;
     Ok(())
 }
@@ -80,7 +83,8 @@ fn db_filepath() -> PathBuf {
         return path.unwrap().join(".floo.db");
     }
 
-    let home_directory = PathBuf::from(env::var("HOME").expect("Cannot deduce db path without HOME directory"));
+    let home_directory =
+        PathBuf::from(env::var("HOME").expect("Cannot deduce db path without HOME directory"));
     let floo_directory = home_directory.join(".local/share/floo/");
 
     if !floo_directory.exists() {

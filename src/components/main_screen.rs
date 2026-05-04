@@ -105,7 +105,8 @@ impl MainScreen {
     }
 
     fn render_notes_tab(&self, area: Rect, buf: &mut ratatui::buffer::Buffer) {
-        let paragraph = Paragraph::new("Placeholder").wrap(Wrap { trim: false });
+        let notes = self.selected_project().notes;
+        let paragraph = Paragraph::new(notes).wrap(Wrap { trim: false });
         paragraph.render(area, buf);
     }
 }
