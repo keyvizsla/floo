@@ -1,9 +1,12 @@
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent};
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect, Spacing};
-use ratatui::symbols::merge::MergeStrategy;
-use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph, Wrap};
+use ratatui::style::Modifier;
+use ratatui::text::{Line, Span};
+use ratatui::widgets::{Paragraph, Wrap};
 use ratatui_interact::components::{Tab, TabView, TabViewState};
+use ratatui_interact::prelude::{ListPicker, ListPickerState};
+use ratatui_interact::traits::Focusable;
 use ratatui_interact::utils::render_markdown_to_lines;
 
 use crate::action::Action;
@@ -19,9 +22,9 @@ use ratatui::widgets::Widget;
 #[derive(Default)]
 pub struct MainScreen {
     projects: Vec<Project>,
-    selected_project: usize,
     description_scroll: u16,
     tab_state: TabViewState,
+    list_state: ListPickerState,
     deletion_popup: Option<DeletionPopup>,
     creation_popup: Option<NewFireplaceComponent>,
     help_popup: Option<HelpPopup>,
@@ -29,51 +32,54 @@ pub struct MainScreen {
 
 impl MainScreen {
     pub fn init_with_projects(projects: Vec<Project>) -> Self {
-        let selected_project = 0;
         let mut tab_state = TabViewState::new(2);
+        let mut list_state = ListPickerState::new(projects.len());
         tab_state.select(0);
+        list_state.select_first();
         MainScreen {
             projects,
-            selected_project,
             description_scroll: 0,
             deletion_popup: None,
             creation_popup: None,
             help_popup: None,
             tab_state,
+            list_state,
         }
     }
 
     fn selected_project(&self) -> Project {
-        self.projects[self.selected_project].clone()
+        self.projects[self.list_state.selected_index].clone()
     }
 
     fn select_next_project(&mut self) {
-        self.selected_project += 1;
-        if self.selected_project >= self.projects.len() {
-            self.selected_project = 0;
+        if self.list_state.selected_index == self.list_state.total_items - 1 {
+            self.list_state.select_first();
+        } else {
+            self.list_state.select_next();
         }
     }
 
     fn select_previous_project(&mut self) {
-        if self.selected_project == 0 {
-            self.selected_project = self.projects.len() - 1;
+        if self.list_state.selected_index == 0 {
+            self.list_state.select_last();
         } else {
-            self.selected_project -= 1;
+            self.list_state.select_prev();
         }
     }
 
     pub fn add_project(&mut self, project: Project) {
         self.projects.push(project);
-        self.selected_project = self.projects.len() - 1;
+        self.list_state = ListPickerState::new(self.projects.len());
+
+        // Select the newly created project, users will likely want that one
+        self.list_state.select_last();
     }
 
     pub fn remove_project(&mut self, project: &Project) {
         remove_project(&mut self.projects, project);
-        if self.projects.len() == 0 {
-            self.selected_project = 0;
-        } else if self.selected_project >= self.projects.len() {
-            self.selected_project = self.projects.len() - 1;
-        }
+        let old_idx = self.list_state.selected_index;
+        self.list_state = ListPickerState::new(self.projects.len());
+        self.list_state.select(old_idx);
     }
 
     fn render_tab_content(&self, idx: usize, area: Rect, buf: &mut ratatui::buffer::Buffer) {
@@ -232,38 +238,39 @@ impl Component for MainScreen {
     }
 
     fn render(&mut self, f: &mut Frame, rect: Rect) {
-        let list_items: Vec<ListItem> = self
+        let list_items: Vec<Line> = self
             .projects
             .iter()
-            .map(|i| ListItem::new(i.name.clone()))
+            .map(|i| Line::from(i.name.clone()))
             .collect();
 
-        let list = List::new(list_items)
-            .block(
-                Block::default()
-                    .title(" Select an Item (press `h` for help) ")
-                    .borders(Borders::ALL)
-                    .merge_borders(MergeStrategy::Exact),
-            )
-            .highlight_symbol(">> ")
-            .repeat_highlight_symbol(true);
+        let fireplace_picker = ListPicker::new(&list_items, &self.list_state);
+
+        let title = Span::styled(
+            " Select a Fireplace to travel to",
+            // TODO: See if there is a cleaner way to access the current style of ratatui interact
+            self.tab_state.focused_style().add_modifier(Modifier::BOLD),
+        );
+
         let [left, right] = Layout::horizontal([Constraint::Fill(1); 2])
             .spacing(Spacing::Overlap(1))
             .areas(f.area());
 
-        let mut list_state = ListState::default().with_selected(Some(self.selected_project));
+        // We have the title as a seperate widget to enable spacial alignnment with
+        // the righthand tabview.
+        let [top_left, left] =
+            Layout::vertical([Constraint::Length(1), Constraint::Fill(1)]).areas(left);
 
-        f.render_stateful_widget(list, left, &mut list_state);
+        f.render_widget(title, top_left);
+        f.render_widget(fireplace_picker, left);
 
         let tabs = vec![
             Tab::new("About").icon("\u{2139}"),  // Info icon
             Tab::new("Notes").icon("\u{1F5B5}"), // Monitor icon
         ];
-        let tab_view = TabView::new(&tabs, &self.tab_state)
-            //.style(style)
-            .content(|idx, area, buf| {
-                self.render_tab_content(idx, area, buf);
-            });
+        let tab_view = TabView::new(&tabs, &self.tab_state).content(|idx, area, buf| {
+            self.render_tab_content(idx, area, buf);
+        });
 
         f.render_widget(tab_view, right);
 
