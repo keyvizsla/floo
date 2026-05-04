@@ -3,6 +3,7 @@ use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect, Spacing};
 use ratatui::symbols::merge::MergeStrategy;
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph, Wrap};
+use ratatui_interact::components::{Tab, TabView, TabViewState};
 use ratatui_interact::utils::render_markdown_to_lines;
 
 use crate::action::Action;
@@ -13,11 +14,14 @@ use crate::components::new_fireplace_popup::NewFireplaceComponent;
 use crate::project::Project;
 use crate::utils::remove_project;
 
+use ratatui::widgets::Widget;
+
 #[derive(Default)]
 pub struct MainScreen {
     projects: Vec<Project>,
     selected_project: usize,
     description_scroll: u16,
+    tab_state: TabViewState,
     deletion_popup: Option<DeletionPopup>,
     creation_popup: Option<NewFireplaceComponent>,
     help_popup: Option<HelpPopup>,
@@ -26,6 +30,8 @@ pub struct MainScreen {
 impl MainScreen {
     pub fn init_with_projects(projects: Vec<Project>) -> Self {
         let selected_project = 0;
+        let mut tab_state = TabViewState::new(2);
+        tab_state.select(0);
         MainScreen {
             projects,
             selected_project,
@@ -33,6 +39,7 @@ impl MainScreen {
             deletion_popup: None,
             creation_popup: None,
             help_popup: None,
+            tab_state,
         }
     }
 
@@ -67,6 +74,33 @@ impl MainScreen {
         } else if self.selected_project >= self.projects.len() {
             self.selected_project = self.projects.len() - 1;
         }
+    }
+
+    fn render_tab_content(&self, idx: usize, area: Rect, buf: &mut ratatui::buffer::Buffer) {
+        match idx {
+            0 => self.render_description_tab(area, buf),
+            1 => self.render_notes_tab(area, buf),
+            _ => {}
+        }
+    }
+
+    fn render_description_tab(&self, area: Rect, buf: &mut ratatui::buffer::Buffer) {
+        let raw_project_description = self
+            .selected_project()
+            .get_description()
+            .unwrap_or_else(|| "No description available.".to_string());
+
+        let parsed_text = render_markdown_to_lines(raw_project_description.as_str());
+
+        let paragraph = Paragraph::new(parsed_text)
+            .scroll((self.description_scroll, 0))
+            .wrap(Wrap { trim: false });
+        paragraph.render(area, buf);
+    }
+
+    fn render_notes_tab(&self, area: Rect, buf: &mut ratatui::buffer::Buffer) {
+        let paragraph = Paragraph::new("Placeholder").wrap(Wrap { trim: false });
+        paragraph.render(area, buf);
     }
 }
 
@@ -164,6 +198,14 @@ impl Component for MainScreen {
                 self.help_popup = Some(popup);
                 Action::Noop
             }
+            KeyCode::Tab => {
+                if self.tab_state.selected_index == self.tab_state.total_tabs - 1 {
+                    self.tab_state.select_first();
+                } else {
+                    self.tab_state.select_next();
+                }
+                Action::Noop
+            }
             KeyCode::Enter => Action::Pick(self.selected_project()),
             _ => Action::Noop,
         }
@@ -213,23 +255,17 @@ impl Component for MainScreen {
 
         f.render_stateful_widget(list, left, &mut list_state);
 
-        let raw_project_description = self
-            .selected_project()
-            .get_description()
-            .unwrap_or_else(|| "No description available.".to_string());
+        let tabs = vec![
+            Tab::new("About").icon("\u{2139}"),  // Info icon
+            Tab::new("Notes").icon("\u{1F5B5}"), // Monitor icon
+        ];
+        let tab_view = TabView::new(&tabs, &self.tab_state)
+            //.style(style)
+            .content(|idx, area, buf| {
+                self.render_tab_content(idx, area, buf);
+            });
 
-        let parsed_text = render_markdown_to_lines(raw_project_description.as_str());
-
-        let paragraph = Paragraph::new(parsed_text)
-            .scroll((self.description_scroll, 0))
-            .block(
-                Block::bordered()
-                    .title("Project Description")
-                    .merge_borders(MergeStrategy::Exact),
-            )
-            .wrap(Wrap { trim: false });
-
-        f.render_widget(paragraph, right);
+        f.render_widget(tab_view, right);
 
         if let Some(deletion_popup) = &mut self.deletion_popup {
             deletion_popup.render(f, rect);
