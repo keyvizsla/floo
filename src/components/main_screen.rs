@@ -106,7 +106,9 @@ impl MainScreen {
 
     fn render_notes_tab(&self, area: Rect, buf: &mut ratatui::buffer::Buffer) {
         let notes = self.selected_project().notes;
-        let paragraph = Paragraph::new(notes).wrap(Wrap { trim: false });
+        let parsed_text = render_markdown_to_lines(&notes);
+
+        let paragraph = Paragraph::new(parsed_text).wrap(Wrap { trim: false });
         paragraph.render(area, buf);
     }
 }
@@ -166,6 +168,8 @@ impl Component for MainScreen {
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
+        // TODO: Distinguish between notes and description scroll
+        // based on the open tab
         if key.modifiers == KeyModifiers::CONTROL {
             if let KeyCode::Char('d') = key.code {
                 self.description_scroll += 5;
