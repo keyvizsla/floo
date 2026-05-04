@@ -247,7 +247,7 @@ impl Component for MainScreen {
         let fireplace_picker = ListPicker::new(&list_items, &self.list_state);
 
         let title = Span::styled(
-            " Select a Fireplace to travel to",
+            " Select a Fireplace to travel to (Press `h` for help)",
             // TODO: See if there is a cleaner way to access the current style of ratatui interact
             self.tab_state.focused_style().add_modifier(Modifier::BOLD),
         );
