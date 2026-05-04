@@ -70,6 +70,13 @@ pub fn remove_project(project: Project) -> Result<()> {
     Ok(())
 }
 
+pub fn change_notes(project: &Project, new_notes: &str) -> Result<()> {
+    let conn = get_safe_db_connection()?;
+    let mut stmt = conn.prepare("UPDATE projects SET notes = ?1 WHERE name = ?2;")?;
+    stmt.execute(params![new_notes, project.name,])?;
+    Ok(())
+}
+
 /// Private function to resolve the true filepath
 /// of the database based on environment configuration.
 fn db_filepath() -> PathBuf {

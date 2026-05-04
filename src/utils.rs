@@ -6,6 +6,15 @@ pub fn remove_project(projects: &mut Vec<Project>, project_to_delete: &Project) 
     projects.retain(|p| p.name != project_to_delete.name);
 }
 
+pub fn replace_project(projects: &mut Vec<Project>, old_project: &Project, new_project: Project) {
+    for i in 0..projects.len() {
+        if projects[i].name == old_project.name {
+            projects[i] = new_project.clone();
+            return;
+        }
+    }
+}
+
 /// Outputs the floo shell wrapper function.
 /// Should only be used by the installer.
 pub fn init_sys() {

@@ -15,7 +15,7 @@ use crate::components::deletion_popup::DeletionPopup;
 use crate::components::help_popup::HelpPopup;
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
 use crate::project::Project;
-use crate::utils::remove_project;
+use crate::utils::{remove_project, replace_project};
 
 use ratatui::widgets::Widget;
 
@@ -205,6 +205,13 @@ impl Component for MainScreen {
                 self.help_popup = Some(popup);
                 Action::Noop
             }
+            KeyCode::Char('e') => {
+                if self.tab_state.selected_index == 1 {
+                    Action::EditNotes(self.selected_project())
+                } else {
+                    Action::Noop
+                }
+            }
             KeyCode::Tab => {
                 if self.tab_state.selected_index == self.tab_state.total_tabs - 1 {
                     self.tab_state.select_first();
@@ -233,6 +240,10 @@ impl Component for MainScreen {
                 };
                 let _ = self.creation_popup.as_mut().unwrap().init();
             }
+            Action::ReplaceProject {
+                old: old_project,
+                new: new_project,
+            } => replace_project(&mut self.projects, &old_project, new_project),
             _ => {}
         }
         Action::Noop

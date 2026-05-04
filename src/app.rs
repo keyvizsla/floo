@@ -11,8 +11,10 @@ use crossterm::terminal::{
 use crossterm::{event, execute};
 use ratatui::{Terminal, backend::CrosstermBackend};
 use std::env;
-use std::io::{self, Stdout};
+use std::io::{self, Stdout, stdout};
 use std::path::PathBuf;
+
+use ratatui::crossterm::ExecutableCommand;
 
 pub struct AppCreationError {}
 pub struct App {
@@ -35,6 +37,16 @@ impl App {
         execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
         let backend = CrosstermBackend::new(stdout);
         Ok(Terminal::new(backend)?)
+    }
+
+    fn edit_notes(&mut self, notes: String) -> Result<String, io::Error> {
+        stdout().execute(LeaveAlternateScreen)?;
+        disable_raw_mode()?;
+        let edited = edit::edit(notes)?;
+        stdout().execute(EnterAlternateScreen)?;
+        enable_raw_mode()?;
+        self.terminal.clear()?;
+        Ok(edited)
     }
 
     pub fn new() -> Result<Self, AppCreationError> {
@@ -91,7 +103,24 @@ impl App {
         loop {
             self.draw();
             let action = self.tui.handle_events(event::read().ok());
-            match action.clone() {
+            let tui_update = match action.clone() {
+                Action::EditNotes(project) => {
+                    if let Ok(updated_notes) = self.edit_notes(project.notes.clone()) {
+                        let new_project = Project {
+                            name: project.name.clone(),
+                            directory: project.directory.clone(),
+                            notes: updated_notes.clone(),
+                        };
+                        let _ = db_handler::change_notes(&project, &updated_notes);
+                        self.state.replace_project(&project, new_project.clone());
+                        Action::ReplaceProject {
+                            old: project,
+                            new: new_project,
+                        }
+                    } else {
+                        Action::Noop
+                    }
+                }
                 Action::Quit => {
                     self.cleanup();
                     return;
@@ -105,15 +134,17 @@ impl App {
                     // TODO: If db write not successful, show an error popup
                     let _ = db_handler::add_project(project.clone());
                     self.state.projects.push(project.clone());
+                    action
                 }
                 Action::DeleteFireplace(project) => {
                     // TODO: If db write not successful, show an error popup
                     let _ = db_handler::remove_project(project.clone());
                     self.state.remove_project(&project);
+                    action
                 }
-                _ => {}
-            }
-            self.tui.update(action);
+                _ => Action::Noop,
+            };
+            self.tui.update(tui_update);
         }
     }
 }
