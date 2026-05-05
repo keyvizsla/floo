@@ -129,9 +129,6 @@ Built with ❤️ for the terminal-centric developer.
 ### Future features
 
 - Show an error toast popup when something went wrong
-- Per project notes and todos displayed below readme, notes stored in db
-- Ergonomic fireplace creation by running `floo create` in a directory, which opens floo with an open creation poppup, with pre-filled directory
-- Better markdown rendering: Test the usage of the markdown feature of ratatui_interactive
 - Sorting: Users can configure the order in which to list their fireplaces (by last used, lexicographically, ...)
 - Auto-Ignition: Templates for `.floo` script creation. Workflows oftentimes look very similar.
 - Statusline per project with git status and possibly something like main programming language.
