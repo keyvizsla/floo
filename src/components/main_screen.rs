@@ -15,7 +15,7 @@ use crate::components::deletion_popup::DeletionPopup;
 use crate::components::help_popup::HelpPopup;
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
 use crate::project::Project;
-use crate::utils::remove_project;
+use crate::utils::{remove_project, replace_project};
 
 use ratatui::widgets::Widget;
 
@@ -105,7 +105,10 @@ impl MainScreen {
     }
 
     fn render_notes_tab(&self, area: Rect, buf: &mut ratatui::buffer::Buffer) {
-        let paragraph = Paragraph::new("Placeholder").wrap(Wrap { trim: false });
+        let notes = self.selected_project().notes;
+        let parsed_text = render_markdown_to_lines(&notes);
+
+        let paragraph = Paragraph::new(parsed_text).wrap(Wrap { trim: false });
         paragraph.render(area, buf);
     }
 }
@@ -165,6 +168,8 @@ impl Component for MainScreen {
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
+        // TODO: Distinguish between notes and description scroll
+        // based on the open tab
         if key.modifiers == KeyModifiers::CONTROL {
             if let KeyCode::Char('d') = key.code {
                 self.description_scroll += 5;
@@ -204,6 +209,13 @@ impl Component for MainScreen {
                 self.help_popup = Some(popup);
                 Action::Noop
             }
+            KeyCode::Char('e') => {
+                if self.tab_state.selected_index == 1 {
+                    Action::EditNotes(self.selected_project())
+                } else {
+                    Action::Noop
+                }
+            }
             KeyCode::Tab => {
                 if self.tab_state.selected_index == self.tab_state.total_tabs - 1 {
                     self.tab_state.select_first();
@@ -232,6 +244,10 @@ impl Component for MainScreen {
                 };
                 let _ = self.creation_popup.as_mut().unwrap().init();
             }
+            Action::ReplaceProject {
+                old: old_project,
+                new: new_project,
+            } => replace_project(&mut self.projects, &old_project, new_project),
             _ => {}
         }
         Action::Noop

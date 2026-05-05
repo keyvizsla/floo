@@ -8,5 +8,7 @@ pub enum Action {
     Pick(Project),
     OpenCreationPopup(Option<Project>),
     ClosePopup,
+    EditNotes(Project),
+    ReplaceProject { old: Project, new: Project },
     Noop,
 }

@@ -9,7 +9,7 @@ use crate::{
         start_screen::StartScreen,
     },
     project::Project,
-    utils::remove_project,
+    utils::{remove_project, replace_project},
 };
 
 #[derive(Default)]
@@ -60,6 +60,10 @@ impl Component for Tui {
         match action.clone() {
             Action::AddFireplace(project) => self.projects.push(project),
             Action::DeleteFireplace(project) => remove_project(&mut self.projects, &project),
+            Action::ReplaceProject {
+                old: old_project,
+                new: new_project,
+            } => replace_project(&mut self.projects, &old_project, new_project),
             _ => {}
         }
         self.main_screen.update(action.clone());

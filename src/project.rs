@@ -5,6 +5,7 @@ use std::path::PathBuf;
 pub struct Project {
     pub name: String,
     pub directory: PathBuf,
+    pub notes: String,
 }
 
 impl Project {
