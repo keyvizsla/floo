@@ -127,6 +127,7 @@ impl App {
                     return;
                 }
                 Action::Pick(project) => {
+                    let _ = db_handler::set_last_accessed_to_now(&project);
                     let _ = Self::output_shell_cmd(&project, &Self::output_path());
                     self.cleanup();
                     return;

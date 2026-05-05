@@ -81,6 +81,18 @@ pub fn change_notes(project: &Project, new_notes: &str) -> Result<()> {
     Ok(())
 }
 
+/// Update the last_accessed property of the project to be now
+pub fn set_last_accessed_to_now(project: &Project) -> Result<()> {
+    let conn = get_safe_db_connection()?;
+    let mut stmt = conn.prepare("UPDATE projects SET last_accessed = ?1 WHERE name = ?2;")?;
+    let seconds = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs() as i64;
+    stmt.execute(params![seconds, project.name,])?;
+    Ok(())
+}
+
 /// Private function to resolve the true filepath
 /// of the database based on environment configuration.
 fn db_filepath() -> PathBuf {
