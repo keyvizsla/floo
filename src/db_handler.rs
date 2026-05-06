@@ -17,7 +17,8 @@ pub fn get_safe_db_connection() -> Result<Connection> {
             id integer primary key,
             name text not null unique,
             directory text not null unique,
-            notes text
+            notes text,
+            last_accessed integer
         )",
         (),
     )?;
@@ -31,16 +32,17 @@ pub fn get_projects() -> Result<Vec<Project>> {
 
     let projects = {
         let mut stmt = conn.prepare(
-            "SELECT name, directory, notes
+            "SELECT name, directory, notes, last_accessed
          FROM projects;",
         )?;
 
         let project_iter = stmt.query_map([], |row| {
-            Ok(Project {
+            Ok(Project::from(Project {
                 name: row.get::<usize, String>(0)?,
                 directory: row.get::<usize, String>(1)?.into(),
                 notes: row.get::<usize, String>(2)?.into(),
-            })
+                last_accessed: row.get::<usize, i64>(3)?.into(),
+            }))
         })?;
 
         project_iter.collect::<Result<Vec<Project>, _>>()?
@@ -53,12 +55,14 @@ pub fn get_projects() -> Result<Vec<Project>> {
 
 pub fn add_project(project: Project) -> Result<()> {
     let conn = get_safe_db_connection()?;
-    let mut stmt =
-        conn.prepare("INSERT INTO projects (name, directory, notes) VALUES (?1, ?2, ?3)")?;
+    let mut stmt = conn.prepare(
+        "INSERT INTO projects (name, directory, notes, last_accessed) VALUES (?1, ?2, ?3, ?4)",
+    )?;
     stmt.execute(params![
         project.name,
         project.directory.to_str(),
-        project.notes
+        project.notes,
+        project.last_accessed,
     ])?;
     Ok(())
 }
@@ -74,6 +78,18 @@ pub fn change_notes(project: &Project, new_notes: &str) -> Result<()> {
     let conn = get_safe_db_connection()?;
     let mut stmt = conn.prepare("UPDATE projects SET notes = ?1 WHERE name = ?2;")?;
     stmt.execute(params![new_notes, project.name,])?;
+    Ok(())
+}
+
+/// Update the last_accessed property of the project to be now
+pub fn set_last_accessed_to_now(project: &Project) -> Result<()> {
+    let conn = get_safe_db_connection()?;
+    let mut stmt = conn.prepare("UPDATE projects SET last_accessed = ?1 WHERE name = ?2;")?;
+    let seconds = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs() as i64;
+    stmt.execute(params![seconds, project.name,])?;
     Ok(())
 }
 

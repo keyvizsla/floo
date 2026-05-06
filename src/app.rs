@@ -110,6 +110,7 @@ impl App {
                             name: project.name.clone(),
                             directory: project.directory.clone(),
                             notes: updated_notes.clone(),
+                            last_accessed: project.last_accessed.clone(),
                         };
                         let _ = db_handler::change_notes(&project, &updated_notes);
                         self.state.replace_project(&project, new_project.clone());
@@ -126,6 +127,7 @@ impl App {
                     return;
                 }
                 Action::Pick(project) => {
+                    let _ = db_handler::set_last_accessed_to_now(&project);
                     let _ = Self::output_shell_cmd(&project, &Self::output_path());
                     self.cleanup();
                     return;

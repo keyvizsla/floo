@@ -115,6 +115,7 @@ impl NewFireplaceComponent {
                                 .canonicalize()
                                 .unwrap_or_else(|_| PathBuf::from(content.directory.text.clone())),
                             notes: String::new(),
+                            last_accessed: 0,
                         };
                         return Action::AddFireplace(new_project);
                     }

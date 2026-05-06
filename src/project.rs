@@ -6,6 +6,7 @@ pub struct Project {
     pub name: String,
     pub directory: PathBuf,
     pub notes: String,
+    pub last_accessed: i64,
 }
 
 impl Project {

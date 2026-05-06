@@ -115,6 +115,8 @@ impl MainScreen {
 
 impl Component for MainScreen {
     fn init(&mut self) -> Result<(), ComponentCreationError> {
+        self.projects.sort_by_key(|x| x.last_accessed);
+        self.projects.reverse();
         Ok(())
     }
 
