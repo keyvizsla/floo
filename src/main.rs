@@ -17,6 +17,7 @@ mod utils;
 
 #[derive(Parser)]
 #[command(name = "FLOO")]
+#[command(version)]
 #[command(about = "TODO: Write about section", long_about = None)]
 struct Cli {
     #[command(subcommand)]
