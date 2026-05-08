@@ -1,4 +1,4 @@
-use crate::project::Project;
+use crate::{errors::FlooError, project::Project};
 
 #[derive(Clone)]
 pub enum Action {
@@ -10,5 +10,6 @@ pub enum Action {
     ClosePopup,
     EditNotes(Project),
     ReplaceProject { old: Project, new: Project },
+    Error(FlooError),
     Noop,
 }

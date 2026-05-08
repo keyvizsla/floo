@@ -10,6 +10,7 @@ mod action;
 mod app;
 mod components;
 mod db_handler;
+mod errors;
 mod project;
 mod state;
 mod utils;
