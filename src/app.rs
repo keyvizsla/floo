@@ -2,6 +2,7 @@ use crate::action::Action;
 use crate::components::component::Component;
 use crate::components::tui::Tui;
 use crate::db_handler;
+use crate::errors::FlooError;
 use crate::project::Project;
 use crate::state::AppState;
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
@@ -112,11 +113,18 @@ impl App {
                             notes: updated_notes.clone(),
                             last_accessed: project.last_accessed.clone(),
                         };
-                        let _ = db_handler::change_notes(&project, &updated_notes);
-                        self.state.replace_project(&project, new_project.clone());
-                        Action::ReplaceProject {
-                            old: project,
-                            new: new_project,
+                        match db_handler::change_notes(&project, &updated_notes) {
+                            Ok(_) => {
+                                self.state.remove_project(&project);
+                                self.state.replace_project(&project, new_project.clone());
+                                Action::ReplaceProject {
+                                    old: project,
+                                    new: new_project,
+                                }
+                            }
+                            Err(_) => Action::Error(FlooError::DbUpdateError(
+                                "Failed to update notes".to_string(),
+                            )),
                         }
                     } else {
                         Action::Noop
@@ -127,22 +135,33 @@ impl App {
                     return;
                 }
                 Action::Pick(project) => {
+                    // Ignore errors in the database update, since these are not critical
                     let _ = db_handler::set_last_accessed_to_now(&project);
                     let _ = Self::output_shell_cmd(&project, &Self::output_path());
                     self.cleanup();
                     return;
                 }
                 Action::AddFireplace(project) => {
-                    // TODO: If db write not successful, show an error popup
-                    let _ = db_handler::add_project(project.clone());
-                    self.state.projects.push(project.clone());
-                    action
+                    match db_handler::add_project(project.clone()) {
+                        Ok(_) => {
+                            self.state.projects.push(project.clone());
+                            action
+                        }
+                        Err(_) => Action::Error(FlooError::DbUpdateError(
+                            "Could not add fireplace.".to_string(),
+                        )),
+                    }
                 }
                 Action::DeleteFireplace(project) => {
-                    // TODO: If db write not successful, show an error popup
-                    let _ = db_handler::remove_project(project.clone());
-                    self.state.remove_project(&project);
-                    action
+                    match db_handler::remove_project(project.clone()) {
+                        Ok(_) => {
+                            self.state.remove_project(&project);
+                            action
+                        }
+                        Err(_) => Action::Error(FlooError::DbUpdateError(
+                            "Could not delete fireplace.".to_string(),
+                        )),
+                    }
                 }
                 _ => Action::Noop,
             };

@@ -3,9 +3,9 @@ use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect, Spacing};
 use ratatui::style::Modifier;
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Paragraph, Wrap};
+use ratatui::widgets::{Clear, Paragraph, Wrap};
 use ratatui_interact::components::{Tab, TabView, TabViewState};
-use ratatui_interact::prelude::{ListPicker, ListPickerState};
+use ratatui_interact::prelude::{ListPicker, ListPickerState, Toast, ToastState, ToastStyle};
 use ratatui_interact::traits::Focusable;
 use ratatui_interact::utils::render_markdown_to_lines;
 
@@ -14,6 +14,7 @@ use crate::components::component::{Component, ComponentCreationError};
 use crate::components::deletion_popup::DeletionPopup;
 use crate::components::help_popup::HelpPopup;
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
+use crate::errors::FlooError;
 use crate::project::Project;
 use crate::utils::{remove_project, replace_project};
 
@@ -25,6 +26,7 @@ pub struct MainScreen {
     description_scroll: u16,
     tab_state: TabViewState,
     list_state: ListPickerState,
+    toast_state: ToastState,
     deletion_popup: Option<DeletionPopup>,
     creation_popup: Option<NewFireplaceComponent>,
     help_popup: Option<HelpPopup>,
@@ -34,6 +36,7 @@ impl MainScreen {
     pub fn init_with_projects(projects: Vec<Project>) -> Self {
         let mut tab_state = TabViewState::new(2);
         let mut list_state = ListPickerState::new(projects.len());
+        let toast_state = ToastState::new();
         tab_state.select(0);
         list_state.select_first();
         MainScreen {
@@ -44,6 +47,7 @@ impl MainScreen {
             help_popup: None,
             tab_state,
             list_state,
+            toast_state,
         }
     }
 
@@ -111,6 +115,22 @@ impl MainScreen {
         let paragraph = Paragraph::new(parsed_text).wrap(Wrap { trim: false });
         paragraph.render(area, buf);
     }
+
+    fn render_notifications(&mut self, f: &mut Frame, area: Rect) {
+        self.toast_state.clear_if_expired();
+        if self.toast_state.get_message().is_none() {
+            return;
+        }
+        let message = self.toast_state.get_message().unwrap();
+        let toast = Toast::new(message).style(ToastStyle::Error);
+        let target_dimensions = toast.calculate_area(area);
+        let [_, toast_area_horizontal, _] = Layout::horizontal([Constraint::Fill(1), Constraint::Length(target_dimensions.width), Constraint::Length(2)]).areas(area);
+        let [_, toast_area, _] = Layout::vertical([Constraint::Fill(1), Constraint::Length(target_dimensions.height), Constraint::Length(1)]).areas(toast_area_horizontal);
+
+        // We don't use render_with_clear on purpose, since that messes with the alignment of the toast
+        Clear.render(toast_area, f.buffer_mut());
+        toast.render(toast_area, f.buffer_mut());
+    }
 }
 
 impl Component for MainScreen {
@@ -121,6 +141,7 @@ impl Component for MainScreen {
     }
 
     fn handle_events(&mut self, event: Option<Event>) -> Action {
+        self.toast_state.clear_if_expired();
         if event.is_none() {
             return Action::Noop;
         }
@@ -250,6 +271,9 @@ impl Component for MainScreen {
                 old: old_project,
                 new: new_project,
             } => replace_project(&mut self.projects, &old_project, new_project),
+            Action::Error(FlooError::DbUpdateError(msg)) => {
+                self.toast_state.show(msg, 3000);
+            }
             _ => {}
         }
         Action::Noop
@@ -303,5 +327,7 @@ impl Component for MainScreen {
         if let Some(help_popup) = &mut self.help_popup {
             help_popup.render(f, rect);
         }
+
+        self.render_notifications(f, rect);
     }
 }

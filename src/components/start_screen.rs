@@ -5,11 +5,33 @@ use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use ratatui::prelude::{Color, Line, Modifier, Span, Style, Stylize, Text};
-use ratatui::widgets::Paragraph;
+use ratatui::widgets::{Clear, Paragraph};
+use ratatui_interact::components::{Toast, ToastState, ToastStyle};
+use ratatui::widgets::Widget;
+use crate::errors::FlooError;
 
 #[derive(Default)]
 pub struct StartScreen {
     creation_popup: Option<NewFireplaceComponent>,
+    toast_state: ToastState,
+}
+
+impl StartScreen {
+    fn render_notifications(&mut self, f: &mut Frame, area: Rect) {
+        self.toast_state.clear_if_expired();
+        if self.toast_state.get_message().is_none() {
+            return;
+        }
+        let message = self.toast_state.get_message().unwrap();
+        let toast = Toast::new(message).style(ToastStyle::Error);
+        let target_dimensions = toast.calculate_area(area);
+        let [_, toast_area_horizontal, _] = Layout::horizontal([Constraint::Fill(1), Constraint::Length(target_dimensions.width), Constraint::Length(2)]).areas(area);
+        let [_, toast_area, _] = Layout::vertical([Constraint::Fill(1), Constraint::Length(target_dimensions.height), Constraint::Length(1)]).areas(toast_area_horizontal);
+
+        // We don't use render_with_clear on purpose, since that messes with the alignment of the toast
+        Clear.render(toast_area, f.buffer_mut());
+        toast.render(toast_area, f.buffer_mut());
+    }
 }
 
 impl Component for StartScreen {
@@ -19,6 +41,7 @@ impl Component for StartScreen {
     }
 
     fn handle_events(&mut self, event: Option<Event>) -> Action {
+        self.toast_state.clear_if_expired();
         if event.is_none() {
             return Action::Noop;
         }
@@ -68,12 +91,15 @@ impl Component for StartScreen {
                 };
                 let _ = self.creation_popup.as_mut().unwrap().init();
             }
+            Action::Error(FlooError::DbUpdateError(msg)) => {
+                self.toast_state.show(msg, 3000);
+            }
             _ => {}
         }
         Action::Noop
     }
 
-    fn render(&mut self, f: &mut Frame, _: Rect) {
+    fn render(&mut self, f: &mut Frame, area: Rect) {
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
@@ -81,7 +107,7 @@ impl Component for StartScreen {
                 Constraint::Length(12),
                 Constraint::Percentage(30),
             ])
-            .split(f.area());
+            .split(area);
 
         let ascii_logo = "
    ███████╗██╗      ██████╗  ██████╗
@@ -118,9 +144,10 @@ impl Component for StartScreen {
         f.render_widget(paragraph, chunks[1]);
 
         if let Some(popup) = &mut self.creation_popup {
-            // TODO: dont render popup on full area
-            popup.render(f, f.area());
+            popup.render(f, area);
         }
+
+        self.render_notifications(f, area);
     }
 }
 

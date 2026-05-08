@@ -10,12 +10,14 @@ mod action;
 mod app;
 mod components;
 mod db_handler;
+mod errors;
 mod project;
 mod state;
 mod utils;
 
 #[derive(Parser)]
 #[command(name = "FLOO")]
+#[command(version)]
 #[command(about = "TODO: Write about section", long_about = None)]
 struct Cli {
     #[command(subcommand)]
