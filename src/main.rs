@@ -16,9 +16,13 @@ mod state;
 mod utils;
 
 #[derive(Parser)]
-#[command(name = "FLOO")]
-#[command(version)]
-#[command(about = "TODO: Write about section", long_about = None)]
+#[command(
+    name = "floo",
+    bin_name = "floo",
+    version,
+    about = "TODO: Write about section",
+    long_about = None,
+)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Command>,
