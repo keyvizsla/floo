@@ -10,6 +10,7 @@ use crossterm::terminal::{
     EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
 };
 use crossterm::{event, execute};
+use edit::Builder;
 use ratatui::{Terminal, backend::CrosstermBackend};
 use std::env;
 use std::io::{self, Stdout, stdout};
@@ -43,7 +44,9 @@ impl App {
     fn edit_notes(&mut self, notes: String) -> Result<String, io::Error> {
         stdout().execute(LeaveAlternateScreen)?;
         disable_raw_mode()?;
-        let edited = edit::edit(notes)?;
+        let mut binding = Builder::new();
+        let tempfile = binding.suffix(".md");
+        let edited = edit::edit_with_builder(notes, tempfile)?;
         stdout().execute(EnterAlternateScreen)?;
         enable_raw_mode()?;
         self.terminal.clear()?;
@@ -141,17 +144,15 @@ impl App {
                     self.cleanup();
                     return;
                 }
-                Action::AddFireplace(project) => {
-                    match db_handler::add_project(project.clone()) {
-                        Ok(_) => {
-                            self.state.projects.push(project.clone());
-                            action
-                        }
-                        Err(_) => Action::Error(FlooError::DbUpdateError(
-                            "Could not add fireplace.".to_string(),
-                        )),
+                Action::AddFireplace(project) => match db_handler::add_project(project.clone()) {
+                    Ok(_) => {
+                        self.state.projects.push(project.clone());
+                        action
                     }
-                }
+                    Err(_) => Action::Error(FlooError::DbUpdateError(
+                        "Could not add fireplace.".to_string(),
+                    )),
+                },
                 Action::DeleteFireplace(project) => {
                     match db_handler::remove_project(project.clone()) {
                         Ok(_) => {
