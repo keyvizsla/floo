@@ -44,13 +44,12 @@ fn main() -> Result<(), io::Error> {
             let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
             let mut prefill = Project::default();
             prefill.directory = path.canonicalize()?;
-            app.run_with_prefilled_popup(Some(prefill));
-            Ok(())
+            app.run_with_prefilled_popup(Some(prefill))
+                .map_err(|_| io::Error::from(io::ErrorKind::Other))
         }
         None => {
             let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
-            app.run();
-            Ok(())
+            app.run().map_err(|_| io::Error::from(io::ErrorKind::Other))
         }
     }
 }

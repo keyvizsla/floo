@@ -276,10 +276,12 @@ impl Component for MainScreen {
             KeyCode::Char('e') => {
                 if self.tab_state.selected_index == 1 {
                     Action::EditNotes(self.selected_project())
-                } else {
+                } else if !self.selected_project().has_startup_script() {
                     let mut popup = SelectTemplatePopup::new(get_template_dir());
                     let _ = popup.init();
                     self.template_popup = Some(popup);
+                    Action::Noop
+                } else {
                     Action::Noop
                 }
             }
