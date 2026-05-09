@@ -14,6 +14,7 @@ use crate::components::component::{Component, ComponentCreationError};
 use crate::components::deletion_popup::DeletionPopup;
 use crate::components::help_popup::HelpPopup;
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
+use crate::components::status_footer::StatusFooter;
 use crate::errors::FlooError;
 use crate::project::Project;
 use crate::utils::{remove_project, replace_project};
@@ -106,6 +107,13 @@ impl MainScreen {
             .scroll((self.description_scroll, 0))
             .wrap(Wrap { trim: false });
         paragraph.render(area, buf);
+
+        if !self.selected_project().has_startup_script() {
+            let message = "No startup script configured. Press `e` to create one from a template."
+                .to_string();
+            let footer = StatusFooter { message };
+            Widget::render(footer, area, buf);
+        }
     }
 
     fn render_notes_tab(&self, area: Rect, buf: &mut ratatui::buffer::Buffer) {

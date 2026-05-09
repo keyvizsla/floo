@@ -5,4 +5,6 @@ pub mod main_screen;
 pub mod new_fireplace_popup;
 pub mod project_list;
 pub mod start_screen;
+pub mod status_footer;
 pub mod tui;
+
