@@ -12,9 +12,9 @@ use crossterm::terminal::{
 use crossterm::{event, execute};
 use edit::Builder;
 use ratatui::{Terminal, backend::CrosstermBackend};
-use std::env;
 use std::io::{self, Stdout, stdout};
 use std::path::PathBuf;
+use std::{env, fs};
 
 use ratatui::crossterm::ExecutableCommand;
 
@@ -53,6 +53,25 @@ impl App {
         Ok(edited)
     }
 
+    fn edit_and_apply_template(
+        &mut self,
+        template: &PathBuf,
+        project: &Project,
+    ) -> Result<(), io::Error> {
+        let file_contents = String::from_utf8(fs::read(template)?)
+            .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid file contents"))?;
+        stdout().execute(LeaveAlternateScreen)?;
+        disable_raw_mode()?;
+        let mut binding = Builder::new();
+        let tempfile = binding.suffix(".sh");
+        let edited = edit::edit_with_builder(file_contents, tempfile)?;
+        fs::write(project.directory.join(".floo"), edited)?;
+        stdout().execute(EnterAlternateScreen)?;
+        enable_raw_mode()?;
+        self.terminal.clear()?;
+        Ok(())
+    }
+
     pub fn new() -> Result<Self, AppCreationError> {
         let state = AppState::init();
         let terminal = Self::init_terminal().map_err(|_| AppCreationError {})?;
@@ -68,11 +87,11 @@ impl App {
     fn output_shell_cmd(project: &Project, output_path: &PathBuf) -> Result<(), io::Error> {
         let mut instructions = String::new();
 
-        instructions.push_str(&format!("cd '{}'\n", project.directory.to_str().unwrap()));
-
         let project_script_path = project.directory.join(".floo");
         if project_script_path.exists() {
             instructions.push_str(&format!("source '{}'\n", project_script_path.display()));
+        } else {
+            instructions.push_str(&format!("cd '{}'\n", project.directory.to_str().unwrap()));
         }
 
         std::fs::write(output_path, instructions)?;
@@ -163,6 +182,13 @@ impl App {
                             "Could not delete fireplace.".to_string(),
                         )),
                     }
+                }
+                Action::SelectTemplate { template, project } => {
+                    if let Some(project) = project {
+                        // TODO: Handle errors
+                        let _ = self.edit_and_apply_template(&template, &project);
+                    }
+                    Action::Noop
                 }
                 _ => Action::Noop,
             };

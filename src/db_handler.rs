@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use rusqlite::{Connection, Result, params};
 
-use crate::project::Project;
+use crate::{project::Project, utils::appdata_dir};
 
 /// Return a safe connection to the database.
 /// A safe connection is one, where users can assume that all
@@ -101,18 +101,6 @@ fn db_filepath() -> PathBuf {
         return path.unwrap();
     }
 
-    let path = env::var("XDG_DATA_HOME").ok().map(PathBuf::from);
-    if path.is_some() {
-        return path.unwrap().join(".floo.db");
-    }
-
-    let home_directory =
-        PathBuf::from(env::var("HOME").expect("Cannot deduce db path without HOME directory"));
-    let floo_directory = home_directory.join(".local/share/floo/");
-
-    if !floo_directory.exists() {
-        std::fs::create_dir_all(&floo_directory).expect("Failed to create .floo directory");
-    }
-
+    let floo_directory = appdata_dir();
     return floo_directory.join(".floo.db");
 }

@@ -12,6 +12,6 @@ clap = { version = "4.6.1", features = ["derive"] }
 crossterm = "0.29.0"
 edit = "0.1.5"
 ratatui = "0.30.0"
-ratatui-interact = { version = "0.5.3", features = ["markdown"] }
+ratatui-interact = { version = "0.5.3", features = ["markdown", "filesystem"] }
 rusqlite = { version = "0.39.0", features = ["bundled"] }
 tui-markdown = "0.3.7"

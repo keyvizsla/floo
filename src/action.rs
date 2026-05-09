@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::{errors::FlooError, project::Project};
 
 #[derive(Clone)]
@@ -9,7 +11,14 @@ pub enum Action {
     OpenCreationPopup(Option<Project>),
     ClosePopup,
     EditNotes(Project),
-    ReplaceProject { old: Project, new: Project },
+    ReplaceProject {
+        old: Project,
+        new: Project,
+    },
+    SelectTemplate {
+        template: PathBuf,
+        project: Option<Project>,
+    },
     Error(FlooError),
     Noop,
 }

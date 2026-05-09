@@ -1,3 +1,5 @@
+use std::{env, path::PathBuf};
+
 use crate::project::Project;
 
 /// Remove a project from the given list of projects.
@@ -49,4 +51,24 @@ pub fn longest_line(text: &str) -> usize {
         }
     }
     max
+}
+
+pub fn appdata_dir() -> PathBuf {
+    let path = env::var("XDG_DATA_HOME").ok().map(PathBuf::from);
+    if path.is_some() {
+        return path.unwrap();
+    }
+    let home_directory =
+        PathBuf::from(env::var("HOME").expect("Cannot deduce apdata path without HOME directory"));
+    let floo_directory = home_directory.join(".local/share/floo/");
+    if !floo_directory.exists() {
+        std::fs::create_dir_all(&floo_directory).expect("Failed to create .floo directory");
+    }
+    return floo_directory;
+}
+
+/// Return the path to the default/configured
+/// directory containing template startup scripts.
+pub fn get_template_dir() -> PathBuf {
+    appdata_dir().join("templates")
 }
