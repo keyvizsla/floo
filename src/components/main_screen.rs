@@ -124,8 +124,18 @@ impl MainScreen {
         let message = self.toast_state.get_message().unwrap();
         let toast = Toast::new(message).style(ToastStyle::Error);
         let target_dimensions = toast.calculate_area(area);
-        let [_, toast_area_horizontal, _] = Layout::horizontal([Constraint::Fill(1), Constraint::Length(target_dimensions.width), Constraint::Length(2)]).areas(area);
-        let [_, toast_area, _] = Layout::vertical([Constraint::Fill(1), Constraint::Length(target_dimensions.height), Constraint::Length(1)]).areas(toast_area_horizontal);
+        let [_, toast_area_horizontal, _] = Layout::horizontal([
+            Constraint::Fill(1),
+            Constraint::Length(target_dimensions.width),
+            Constraint::Length(2),
+        ])
+        .areas(area);
+        let [_, toast_area, _] = Layout::vertical([
+            Constraint::Fill(1),
+            Constraint::Length(target_dimensions.height),
+            Constraint::Length(1),
+        ])
+        .areas(toast_area_horizontal);
 
         // We don't use render_with_clear on purpose, since that messes with the alignment of the toast
         Clear.render(toast_area, f.buffer_mut());
@@ -307,8 +317,8 @@ impl Component for MainScreen {
         f.render_widget(fireplace_picker, left);
 
         let tabs = vec![
-            Tab::new("About").icon("\u{2139}"),  // Info icon
-            Tab::new("Notes").icon("\u{1F5B5}"), // Monitor icon
+            Tab::new("About").icon("\u{2139}"), // Info icon
+            Tab::new("Notes").icon("📒"),       // Notes icon
         ];
         let tab_view = TabView::new(&tabs, &self.tab_state).content(|idx, area, buf| {
             self.render_tab_content(idx, area, buf);
