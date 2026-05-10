@@ -20,8 +20,10 @@ mod utils;
     name = "floo",
     bin_name = "floo",
     version,
-    about = "TODO: Write about section",
-    long_about = None,
+    author = "Leon Degel-Koehn <leon.koehn2002@gmail.com>",
+    about = "Effortless travel between and to workspaces",
+    long_about = "floo v0.1.0-beta.1\n\nEffortless travel between and to workspaces\n\nSee also: <link here>",
+    long_version = "v0.1.0-beta.1\nAuthor: Leon Degel-Koehn <leon.koehn2002@gmail.com>\nCopyright (c) 2026"
 )]
 struct Cli {
     #[command(subcommand)]
