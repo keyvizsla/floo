@@ -1,0 +1,7 @@
+[book]
+title = "floo"
+authors = ["KeyVizsla"]
+language = "en"
+
+[preprocessor.variables.variables]
+floo_version = "0.1.0-beta.1"
