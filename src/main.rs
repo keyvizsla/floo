@@ -16,9 +16,15 @@ mod state;
 mod utils;
 
 #[derive(Parser)]
-#[command(name = "FLOO")]
-#[command(version)]
-#[command(about = "TODO: Write about section", long_about = None)]
+#[command(
+    name = "floo",
+    bin_name = "floo",
+    version,
+    author = "Leon Degel-Koehn <leon.koehn2002@gmail.com>",
+    about = "Effortless travel between and to workspaces",
+    long_about = "floo v0.1.0-beta.1\n\nEffortless travel between and to workspaces\n\nSee also: <link here>",
+    long_version = "v0.1.0-beta.1\nAuthor: Leon Degel-Koehn <leon.koehn2002@gmail.com>\nCopyright (c) 2026"
+)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Command>,
@@ -44,13 +50,12 @@ fn main() -> Result<(), io::Error> {
             let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
             let mut prefill = Project::default();
             prefill.directory = path.canonicalize()?;
-            app.run_with_prefilled_popup(Some(prefill));
-            Ok(())
+            app.run_with_prefilled_popup(Some(prefill))
+                .map_err(|_| io::Error::from(io::ErrorKind::Other))
         }
         None => {
             let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
-            app.run();
-            Ok(())
+            app.run().map_err(|_| io::Error::from(io::ErrorKind::Other))
         }
     }
 }

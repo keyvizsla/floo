@@ -14,9 +14,11 @@ use crate::components::component::{Component, ComponentCreationError};
 use crate::components::deletion_popup::DeletionPopup;
 use crate::components::help_popup::HelpPopup;
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
+use crate::components::select_template::SelectTemplatePopup;
+use crate::components::status_footer::StatusFooter;
 use crate::errors::FlooError;
 use crate::project::Project;
-use crate::utils::{remove_project, replace_project};
+use crate::utils::{get_template_dir, remove_project, replace_project};
 
 use ratatui::widgets::Widget;
 
@@ -30,6 +32,7 @@ pub struct MainScreen {
     deletion_popup: Option<DeletionPopup>,
     creation_popup: Option<NewFireplaceComponent>,
     help_popup: Option<HelpPopup>,
+    template_popup: Option<SelectTemplatePopup>,
 }
 
 impl MainScreen {
@@ -45,6 +48,7 @@ impl MainScreen {
             deletion_popup: None,
             creation_popup: None,
             help_popup: None,
+            template_popup: None,
             tab_state,
             list_state,
             toast_state,
@@ -106,6 +110,13 @@ impl MainScreen {
             .scroll((self.description_scroll, 0))
             .wrap(Wrap { trim: false });
         paragraph.render(area, buf);
+
+        if !self.selected_project().has_startup_script() {
+            let message = "No startup script configured. Press `e` to create one from a template."
+                .to_string();
+            let footer = StatusFooter { message };
+            Widget::render(footer, area, buf);
+        }
     }
 
     fn render_notes_tab(&self, area: Rect, buf: &mut ratatui::buffer::Buffer) {
@@ -194,6 +205,26 @@ impl Component for MainScreen {
             return Action::Noop;
         }
 
+        if let Some(popup) = &mut self.template_popup {
+            match popup.handle_events(event) {
+                Action::ClosePopup => self.template_popup = None,
+                Action::SelectTemplate {
+                    template,
+                    project: _,
+                } => {
+                    self.template_popup = None;
+                    return Action::SelectTemplate {
+                        template,
+                        project: Some(self.selected_project()),
+                    };
+                }
+                _ => {
+                    return Action::Noop;
+                }
+            }
+            return Action::Noop;
+        }
+
         match event.unwrap() {
             Event::Key(e) => self.handle_key_events(e),
             _ => Action::Noop,
@@ -245,6 +276,11 @@ impl Component for MainScreen {
             KeyCode::Char('e') => {
                 if self.tab_state.selected_index == 1 {
                     Action::EditNotes(self.selected_project())
+                } else if !self.selected_project().has_startup_script() {
+                    let mut popup = SelectTemplatePopup::new(get_template_dir());
+                    let _ = popup.init();
+                    self.template_popup = Some(popup);
+                    Action::Noop
                 } else {
                     Action::Noop
                 }
@@ -336,6 +372,10 @@ impl Component for MainScreen {
 
         if let Some(help_popup) = &mut self.help_popup {
             help_popup.render(f, rect);
+        }
+
+        if let Some(popup) = &mut self.template_popup {
+            popup.render(f, rect);
         }
 
         self.render_notifications(f, rect);

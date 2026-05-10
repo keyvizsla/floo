@@ -54,4 +54,8 @@ impl Project {
 
         return Some(description);
     }
+
+    pub fn has_startup_script(&self) -> bool {
+        self.directory.join(".floo").exists()
+    }
 }
