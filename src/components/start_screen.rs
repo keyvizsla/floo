@@ -1,14 +1,31 @@
+/*
+ * Copyright (C) 2026 Leon Degel-Koehn
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
+use crate::errors::FlooError;
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use ratatui::prelude::{Color, Line, Modifier, Span, Style, Stylize, Text};
+use ratatui::widgets::Widget;
 use ratatui::widgets::{Clear, Paragraph};
 use ratatui_interact::components::{Toast, ToastState, ToastStyle};
-use ratatui::widgets::Widget;
-use crate::errors::FlooError;
 
 #[derive(Default)]
 pub struct StartScreen {
@@ -25,8 +42,18 @@ impl StartScreen {
         let message = self.toast_state.get_message().unwrap();
         let toast = Toast::new(message).style(ToastStyle::Error);
         let target_dimensions = toast.calculate_area(area);
-        let [_, toast_area_horizontal, _] = Layout::horizontal([Constraint::Fill(1), Constraint::Length(target_dimensions.width), Constraint::Length(2)]).areas(area);
-        let [_, toast_area, _] = Layout::vertical([Constraint::Fill(1), Constraint::Length(target_dimensions.height), Constraint::Length(1)]).areas(toast_area_horizontal);
+        let [_, toast_area_horizontal, _] = Layout::horizontal([
+            Constraint::Fill(1),
+            Constraint::Length(target_dimensions.width),
+            Constraint::Length(2),
+        ])
+        .areas(area);
+        let [_, toast_area, _] = Layout::vertical([
+            Constraint::Fill(1),
+            Constraint::Length(target_dimensions.height),
+            Constraint::Length(1),
+        ])
+        .areas(toast_area_horizontal);
 
         // We don't use render_with_clear on purpose, since that messes with the alignment of the toast
         Clear.render(toast_area, f.buffer_mut());
@@ -150,4 +177,3 @@ impl Component for StartScreen {
         self.render_notifications(f, area);
     }
 }
-
