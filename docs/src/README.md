@@ -17,14 +17,16 @@
 Version: {{ floo_version }}
 </div>
 
-**floo** is a terminal user interface (TUI) too to automate workspace setup and access.
+**floo** is a terminal user interface (TUI) to automate workspace setup and access.
 
-If you have a very terminal-centric workflow for most of the things you are working on, the
-following will sound very familiar to you, minus the specific tools you use in your day to day work:
+If you have a very terminal-centric workflow, you oftentimes have to perform a set of repetitive
+tasks each time you fire up your machine, before you can start being productive.
+For me this looks something like the following:
 
 1. cd into the root directory of your project
 2. start a tmux session with multiple windows
 3. source workspace specific environment configurations (e.g. virtualenv, or just env stuff) in each window
+4. run your favorite editor in one window
 4. open a webbrowser with some documentation or github issues you are browsing
 5. start actually working on your stuff
 
