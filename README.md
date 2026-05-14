@@ -1,6 +1,8 @@
 # floo
 
-![Floo logo, a fireplace](assets/logo_small.png)
+<p align="center">
+  <img src="assets/logo_small.png">The floo logo</img>
+</p>
 
 ## What is floo
 
