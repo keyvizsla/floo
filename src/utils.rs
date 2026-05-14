@@ -15,8 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use crossterm::{
+    ExecutableCommand,
+    terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
+};
+use edit::Builder;
+use ratatui::{Terminal, prelude::CrosstermBackend};
+
 use crate::project::Project;
-use std::{env, path::PathBuf};
+use std::{
+    env, fs,
+    io::{self, Stdout, stdout},
+    path::PathBuf,
+};
 
 /// Remove a project from the given list of projects.
 /// If the project is not contained, nothing happens.
@@ -87,4 +98,39 @@ pub fn appdata_dir() -> PathBuf {
 /// directory containing template startup scripts.
 pub fn get_template_dir() -> PathBuf {
     appdata_dir().join("templates")
+}
+
+/// Open the editor and return the edited contents
+pub fn open_editor(
+    file_contents: String,
+    file_suffix: Option<String>,
+    terminal: &mut Terminal<CrosstermBackend<Stdout>>,
+) -> Result<String, io::Error> {
+    stdout().execute(LeaveAlternateScreen)?;
+    disable_raw_mode()?;
+    let edited = if let Some(suffix) = file_suffix {
+        let mut binding = Builder::new();
+        let tempfile = binding.suffix(&suffix);
+        edit::edit_with_builder(file_contents, tempfile)?
+    } else {
+        edit::edit(file_contents)?
+    };
+    stdout().execute(EnterAlternateScreen)?;
+    enable_raw_mode()?;
+    terminal.clear()?;
+    Ok(edited)
+}
+
+/// Read the file contents stored at the given filepath and
+/// save the edited contents as a new template with the given name.
+pub fn edit_and_save_template(filepath: PathBuf, template_name: String) -> Result<(), io::Error> {
+    let contents = String::from_utf8(fs::read(filepath)?).map_err(|_| {
+        io::Error::new(io::ErrorKind::InvalidInput, "Unable to parse file as utf-8")
+    })?;
+    let mut binding = Builder::new();
+    let tempfile = binding.suffix(".sh");
+    let edited = edit::edit_with_builder(contents, tempfile)?;
+    let target_path = get_template_dir().join(template_name);
+    fs::write(target_path, edited)?;
+    Ok(())
 }

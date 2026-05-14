@@ -22,6 +22,7 @@ use crate::db_handler;
 use crate::errors::FlooError;
 use crate::project::Project;
 use crate::state::AppState;
+use crate::utils::open_editor;
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use crossterm::terminal::{
     EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
@@ -59,15 +60,7 @@ impl App {
     }
 
     fn edit_notes(&mut self, notes: String) -> Result<String, io::Error> {
-        stdout().execute(LeaveAlternateScreen)?;
-        disable_raw_mode()?;
-        let mut binding = Builder::new();
-        let tempfile = binding.suffix(".md");
-        let edited = edit::edit_with_builder(notes, tempfile)?;
-        stdout().execute(EnterAlternateScreen)?;
-        enable_raw_mode()?;
-        self.terminal.clear()?;
-        Ok(edited)
+        open_editor(notes, Some(".md".to_string()), &mut self.terminal)
     }
 
     fn edit_and_apply_template(
@@ -77,15 +70,8 @@ impl App {
     ) -> Result<(), io::Error> {
         let file_contents = String::from_utf8(fs::read(template)?)
             .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid file contents"))?;
-        stdout().execute(LeaveAlternateScreen)?;
-        disable_raw_mode()?;
-        let mut binding = Builder::new();
-        let tempfile = binding.suffix(".sh");
-        let edited = edit::edit_with_builder(file_contents, tempfile)?;
+        let edited = open_editor(file_contents, Some(".sh".to_string()), &mut self.terminal)?;
         fs::write(project.directory.join(".floo"), edited)?;
-        stdout().execute(EnterAlternateScreen)?;
-        enable_raw_mode()?;
-        self.terminal.clear()?;
         Ok(())
     }
 
