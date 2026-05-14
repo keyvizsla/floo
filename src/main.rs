@@ -50,6 +50,9 @@ fn main() -> Result<(), io::Error> {
             app.run_with_prefilled_popup(Some(prefill))
                 .map_err(|_| io::Error::from(io::ErrorKind::Other))
         }
+        Some(Command::Template { filepath, name }) => {
+            todo!()
+        }
         None => {
             let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
             app.run().map_err(|_| io::Error::from(io::ErrorKind::Other))

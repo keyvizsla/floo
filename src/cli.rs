@@ -25,7 +25,7 @@ use std::path::PathBuf;
     version,
     author = "Leon Degel-Koehn <leon.koehn2002@gmail.com>",
     about = "Effortless travel between and to workspaces",
-    after_help = "Project homepage: <github pages link>\nRepository: https://github.com/Leon-Degel-Koehn/floo",
+    after_help = "Project homepage: https://keyvizsla.github.io/floo\nRepository: https://github.com/keyvizsla/floo",
     help_template = "{before-help}{name} {version}{author-section}{about-section}\n{usage-heading} {usage}\n\n{all-args}{after-help}"
 )]
 pub struct Cli {
@@ -43,5 +43,14 @@ pub enum Command {
         /// Path to the directory for which to set up a fireplace
         #[arg(default_value = ".")]
         path: PathBuf,
+    },
+
+    /// Add a new template from the given file
+    Template {
+        /// Path to the file to base the template on
+        filepath: PathBuf,
+
+        /// Name of the template
+        name: String,
     },
 }
