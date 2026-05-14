@@ -1,6 +1,6 @@
 # floo
 
-![Floo logo, a fireplace](assets/logo.png)
+![Floo logo, a fireplace](assets/logo_small.png)
 
 ## What is floo
 
@@ -22,10 +22,7 @@ care of for you.
 
 ## Resources
 
-You can obtain all the documentation on **floo** including an extensive
-manual on how to use it and its capabilities via the pages:
-
-Links to pages, etc.
+[Manual](https://keyvizsla.github.io/floo/index.html)
 
 ## Installation
 
