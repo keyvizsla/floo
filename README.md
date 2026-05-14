@@ -1,7 +1,8 @@
 # floo
 
 <p align="center">
-  <img src="assets/logo_small.png">The floo logo</img>
+  <img src="assets/logo_small.png" /><br/>
+  <img src="https://github.com/keyvizsla/floo/actions/workflows/deploy_pages.yaml/badge.svg" />
 </p>
 
 ## What is floo
