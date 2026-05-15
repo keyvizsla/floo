@@ -25,9 +25,9 @@ impl SelectTemplatePopup {
     }
 
     fn render_dialog(&mut self, f: &mut Frame, area: Rect) {
-        let config = DialogConfig::new("Help - Exit with `q`")
+        let config = DialogConfig::new("Select a template to apply - Exit with `q`")
             .max_size(area.width, area.height)
-            .ok_cancel();
+            .no_buttons();
 
         let mut dialog =
             PopupDialog::new(&config, &mut self.dialog_state, |frame, area, _content| {
@@ -111,23 +111,23 @@ impl Component for SelectTemplatePopup {
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
-        let focus_target = self.dialog_state.current_focus().cloned();
+        // let focus_target = self.dialog_state.current_focus().cloned();
         match key.code {
-            KeyCode::Tab => {
-                if let Some(DialogFocusTarget::Child(_)) = focus_target {
-                    self.dialog_state.focus.set(DialogFocusTarget::Button(0));
-                    return Action::Noop;
-                }
-                if let Some(DialogFocusTarget::Button(0)) = focus_target {
-                    self.dialog_state.focus.set(DialogFocusTarget::Button(1));
-                    return Action::Noop;
-                }
-                if let Some(DialogFocusTarget::Button(1)) = focus_target {
-                    self.dialog_state.focus.set(DialogFocusTarget::Button(0));
-                    return Action::Noop;
-                }
-                return Action::Noop;
-            }
+            // KeyCode::Tab => {
+            //     if let Some(DialogFocusTarget::Child(_)) = focus_target {
+            //         self.dialog_state.focus.set(DialogFocusTarget::Button(0));
+            //         return Action::Noop;
+            //     }
+            //     if let Some(DialogFocusTarget::Button(0)) = focus_target {
+            //         self.dialog_state.focus.set(DialogFocusTarget::Button(1));
+            //         return Action::Noop;
+            //     }
+            //     if let Some(DialogFocusTarget::Button(1)) = focus_target {
+            //         self.dialog_state.focus.set(DialogFocusTarget::Button(0));
+            //         return Action::Noop;
+            //     }
+            //     return Action::Noop;
+            // }
             KeyCode::Char('q') => Action::ClosePopup,
             _ => {
                 // handle_scrollable_content_key(&mut self.content_state, &key, 1);
