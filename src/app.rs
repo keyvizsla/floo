@@ -21,6 +21,7 @@ use crate::components::tui::Tui;
 use crate::db_handler;
 use crate::errors::FlooError;
 use crate::fireplace::Fireplace;
+use crate::shell::output_shell_cmd;
 use crate::state::AppState;
 use crate::utils::open_editor;
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
@@ -82,31 +83,6 @@ impl App {
             terminal,
             tui,
         })
-    }
-
-    fn output_shell_cmd(project: &Fireplace, output_path: &PathBuf) -> Result<(), io::Error> {
-        let mut instructions = String::new();
-
-        let project_script_path = project.get_directory().join(".floo");
-
-        // Make FLOO environment variables available to .floo scripts
-        instructions.push_str(&format!(
-            "FLOO_DIR='{}'\n",
-            project.get_directory().to_str().unwrap()
-        ));
-        instructions.push_str(&format!("FLOO_NAME='{}'\n", project.name));
-
-        if project_script_path.exists() {
-            instructions.push_str(&format!("source '{}'\n", project_script_path.display()));
-        } else {
-            instructions.push_str(&format!(
-                "cd '{}'\n",
-                project.get_directory().to_str().unwrap()
-            ));
-        }
-
-        std::fs::write(output_path, instructions)?;
-        Ok(())
     }
 
     fn draw(&mut self) {
@@ -174,7 +150,8 @@ impl App {
                     Action::Pick(project) => {
                         // Ignore errors in the database update, since these are not critical
                         let _ = db_handler::set_last_accessed_to_now(&project);
-                        let _ = Self::output_shell_cmd(&project, &Self::output_path());
+                        // TODO: Handle errors
+                        let _ = output_shell_cmd(&project, &Self::output_path());
                         self.cleanup();
                         return Ok(());
                     }

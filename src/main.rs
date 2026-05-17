@@ -33,6 +33,7 @@ mod components;
 mod db_handler;
 mod errors;
 mod fireplace;
+mod shell;
 mod state;
 mod utils;
 
