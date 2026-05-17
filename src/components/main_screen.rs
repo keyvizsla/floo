@@ -294,9 +294,17 @@ impl Component for MainScreen {
                 if self.tab_state.selected_index == 1 {
                     Action::EditNotes(self.selected_project())
                 } else if !self.selected_project().has_startup_script() {
-                    let mut popup = SelectTemplatePopup::new(get_template_dir());
-                    let _ = popup.init();
-                    self.template_popup = Some(popup);
+                    let is_empty = match get_template_dir().read_dir() {
+                        Ok(mut iter) => iter.next().is_none(),
+                        Err(_) => true,
+                    };
+                    if !is_empty {
+                        let mut popup = SelectTemplatePopup::new(get_template_dir());
+                        let _ = popup.init();
+                        self.template_popup = Some(popup);
+                    } else {
+                        return Action::Error(FlooError::NoTemplates);
+                    }
                     Action::Noop
                 } else {
                     Action::Noop
