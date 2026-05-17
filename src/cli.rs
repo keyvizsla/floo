@@ -24,7 +24,7 @@ use std::path::PathBuf;
     bin_name = "floo",
     version,
     author = "Leon Degel-Koehn <leon.koehn2002@gmail.com>",
-    about = "Effortless travel between and to workspaces",
+    about = "Effortless travel to and from workspaces",
     after_help = "Fireplace homepage: https://keyvizsla.github.io/floo\nRepository: https://github.com/keyvizsla/floo",
     help_template = "{before-help}{name} {version}{author-section}{about-section}\n{usage-heading} {usage}\n\n{all-args}{after-help}"
 )]
@@ -45,7 +45,7 @@ pub enum Command {
         path: PathBuf,
     },
 
-    /// Add a new template from the given file
+    /// Create a new template from a given shell script
     Template {
         /// Path to the file to base the template on
         filepath: PathBuf,
@@ -53,4 +53,7 @@ pub enum Command {
         /// Name of the template
         name: String,
     },
+
+    /// Install the default floo templates (this will override local templates of the same name)
+    InstallTemplates,
 }

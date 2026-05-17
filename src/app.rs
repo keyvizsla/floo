@@ -206,6 +206,14 @@ impl App {
                         }
                         Action::Noop
                     }
+                    Action::Error(FlooError::NoTemplates) => {
+                        // TODO: This might be cleaner with a popup instead
+                        self.cleanup();
+                        eprintln!(
+                            "No templates available, you may install some defaults by running `floo install-templates`."
+                        );
+                        return Ok(());
+                    }
                     _ => Action::Noop,
                 };
                 self.tui.update(tui_update);

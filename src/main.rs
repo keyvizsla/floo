@@ -23,7 +23,7 @@ use crate::{
     app::App,
     cli::{Cli, Command},
     fireplace::Fireplace,
-    utils::{edit_and_save_template, init_sys},
+    utils::{edit_and_save_template, init_sys, install_default_templates},
 };
 
 mod action;
@@ -57,6 +57,11 @@ fn main() -> Result<(), io::Error> {
                 Err(_) => eprintln!("Failed to save you new template."),
             };
             res
+        }
+        Some(Command::InstallTemplates) => {
+            install_default_templates();
+            println!("Successfully installed all default floo templates.");
+            Ok(())
         }
         None => {
             let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
