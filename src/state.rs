@@ -16,7 +16,7 @@
 */
 
 use crate::db_handler::get_projects;
-use crate::project::Project;
+use crate::fireplace::Fireplace;
 use crate::utils::replace_project;
 use std::process::exit;
 
@@ -25,7 +25,7 @@ use std::process::exit;
 /// Represents the global state of the App
 #[derive(Debug, Default, Clone)]
 pub struct AppState {
-    pub projects: Vec<Project>,
+    pub projects: Vec<Fireplace>,
 }
 
 impl AppState {
@@ -41,11 +41,11 @@ impl AppState {
         Self { projects }
     }
 
-    pub fn remove_project(&mut self, project: &Project) {
+    pub fn remove_project(&mut self, project: &Fireplace) {
         self.projects.retain(|p| p.name != project.name);
     }
 
-    pub fn replace_project(&mut self, old_project: &Project, new_project: Project) {
+    pub fn replace_project(&mut self, old_project: &Fireplace, new_project: Fireplace) {
         replace_project(&mut self.projects, old_project, new_project);
     }
 }

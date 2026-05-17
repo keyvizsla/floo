@@ -22,7 +22,7 @@ use crossterm::{
 use edit::Builder;
 use ratatui::{Terminal, prelude::CrosstermBackend};
 
-use crate::project::Project;
+use crate::fireplace::Fireplace;
 use std::{
     env, fs,
     io::{self, Stdout, stdout},
@@ -31,11 +31,11 @@ use std::{
 
 /// Remove a project from the given list of projects.
 /// If the project is not contained, nothing happens.
-pub fn remove_project(projects: &mut Vec<Project>, project_to_delete: &Project) {
+pub fn remove_project(projects: &mut Vec<Fireplace>, project_to_delete: &Fireplace) {
     projects.retain(|p| p.name != project_to_delete.name);
 }
 
-pub fn replace_project(projects: &mut Vec<Project>, old_project: &Project, new_project: Project) {
+pub fn replace_project(projects: &mut Vec<Fireplace>, old_project: &Fireplace, new_project: Fireplace) {
     for i in 0..projects.len() {
         if projects[i].name == old_project.name {
             projects[i] = new_project.clone();

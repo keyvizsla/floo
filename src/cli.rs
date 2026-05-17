@@ -25,7 +25,7 @@ use std::path::PathBuf;
     version,
     author = "Leon Degel-Koehn <leon.koehn2002@gmail.com>",
     about = "Effortless travel between and to workspaces",
-    after_help = "Project homepage: https://keyvizsla.github.io/floo\nRepository: https://github.com/keyvizsla/floo",
+    after_help = "Fireplace homepage: https://keyvizsla.github.io/floo\nRepository: https://github.com/keyvizsla/floo",
     help_template = "{before-help}{name} {version}{author-section}{about-section}\n{usage-heading} {usage}\n\n{all-args}{after-help}"
 )]
 pub struct Cli {
