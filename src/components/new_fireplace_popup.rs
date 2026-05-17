@@ -17,7 +17,7 @@
 
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
-use crate::project::Project;
+use crate::fireplace::Fireplace;
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
@@ -41,7 +41,7 @@ impl NewFireplaceComponent {
         }
     }
 
-    pub fn with_prefill(project: Project) -> Self {
+    pub fn with_prefill(project: Fireplace) -> Self {
         let mut popup_content = PopupContent::default();
         popup_content.name.text = project.name;
         popup_content.directory.text = project.directory.to_str().unwrap().to_string();
@@ -126,7 +126,7 @@ impl NewFireplaceComponent {
                     } else if key_code == KeyCode::Up {
                         self.dialog_state.focus.set(DialogFocusTarget::Child(1));
                     } else if is_enter(key) {
-                        let new_project = Project {
+                        let new_project = Fireplace {
                             name: content.name.text.clone(),
                             directory: PathBuf::from(content.directory.text.clone())
                                 .canonicalize()

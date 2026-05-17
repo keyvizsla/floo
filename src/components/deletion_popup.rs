@@ -17,7 +17,7 @@
 
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
-use crate::project::Project;
+use crate::fireplace::Fireplace;
 use crate::utils::longest_line;
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
@@ -29,11 +29,11 @@ use ratatui_interact::prelude::PopupDialog;
 
 pub struct DeletionPopup {
     dialog_state: DialogState<PopupContent>,
-    target_project: Project,
+    target_project: Fireplace,
 }
 
 impl DeletionPopup {
-    pub fn new(target_project: Project) -> Self {
+    pub fn new(target_project: Fireplace) -> Self {
         Self {
             dialog_state: DialogState::new(PopupContent::default()),
             target_project,

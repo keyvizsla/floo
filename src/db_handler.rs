@@ -20,7 +20,7 @@ use std::path::PathBuf;
 
 use rusqlite::{Connection, Result, params};
 
-use crate::{project::Project, utils::appdata_dir};
+use crate::{fireplace::Fireplace, utils::appdata_dir};
 
 /// Return a safe connection to the database.
 /// A safe connection is one, where users can assume that all
@@ -44,7 +44,7 @@ pub fn get_safe_db_connection() -> Result<Connection> {
 }
 
 // Return a list of projects in the local database.
-pub fn get_projects() -> Result<Vec<Project>> {
+pub fn get_projects() -> Result<Vec<Fireplace>> {
     let conn = get_safe_db_connection()?;
 
     let projects = {
@@ -54,7 +54,7 @@ pub fn get_projects() -> Result<Vec<Project>> {
         )?;
 
         let project_iter = stmt.query_map([], |row| {
-            Ok(Project::from(Project {
+            Ok(Fireplace::from(Fireplace {
                 name: row.get::<usize, String>(0)?,
                 directory: row.get::<usize, String>(1)?.into(),
                 notes: row.get::<usize, String>(2)?.into(),
@@ -62,7 +62,7 @@ pub fn get_projects() -> Result<Vec<Project>> {
             }))
         })?;
 
-        project_iter.collect::<Result<Vec<Project>, _>>()?
+        project_iter.collect::<Result<Vec<Fireplace>, _>>()?
     };
 
     conn.close().map_err(|(_, err)| err)?;
@@ -70,7 +70,7 @@ pub fn get_projects() -> Result<Vec<Project>> {
     Ok(projects)
 }
 
-pub fn add_project(project: Project) -> Result<()> {
+pub fn add_project(project: Fireplace) -> Result<()> {
     let conn = get_safe_db_connection()?;
     let mut stmt = conn.prepare(
         "INSERT INTO projects (name, directory, notes, last_accessed) VALUES (?1, ?2, ?3, ?4)",
@@ -84,14 +84,14 @@ pub fn add_project(project: Project) -> Result<()> {
     Ok(())
 }
 
-pub fn remove_project(project: Project) -> Result<()> {
+pub fn remove_project(project: Fireplace) -> Result<()> {
     let conn = get_safe_db_connection()?;
     let mut stmt = conn.prepare("DELETE FROM projects WHERE name = ?1")?;
     stmt.execute(params![project.name])?;
     Ok(())
 }
 
-pub fn change_notes(project: &Project, new_notes: &str) -> Result<()> {
+pub fn change_notes(project: &Fireplace, new_notes: &str) -> Result<()> {
     let conn = get_safe_db_connection()?;
     let mut stmt = conn.prepare("UPDATE projects SET notes = ?1 WHERE name = ?2;")?;
     stmt.execute(params![new_notes, project.name,])?;
@@ -99,7 +99,7 @@ pub fn change_notes(project: &Project, new_notes: &str) -> Result<()> {
 }
 
 /// Update the last_accessed property of the project to be now
-pub fn set_last_accessed_to_now(project: &Project) -> Result<()> {
+pub fn set_last_accessed_to_now(project: &Fireplace) -> Result<()> {
     let conn = get_safe_db_connection()?;
     let mut stmt = conn.prepare("UPDATE projects SET last_accessed = ?1 WHERE name = ?2;")?;
     let seconds = std::time::SystemTime::now()

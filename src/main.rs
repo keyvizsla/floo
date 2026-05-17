@@ -22,7 +22,7 @@ use clap::Parser;
 use crate::{
     app::App,
     cli::{Cli, Command},
-    project::Project,
+    fireplace::Fireplace,
     utils::{edit_and_save_template, init_sys},
 };
 
@@ -32,7 +32,7 @@ mod cli;
 mod components;
 mod db_handler;
 mod errors;
-mod project;
+mod fireplace;
 mod state;
 mod utils;
 
@@ -45,7 +45,7 @@ fn main() -> Result<(), io::Error> {
         }
         Some(Command::Create { path }) => {
             let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
-            let mut prefill = Project::default();
+            let mut prefill = Fireplace::default();
             prefill.directory = path.canonicalize()?;
             app.run_with_prefilled_popup(Some(prefill))
                 .map_err(|_| io::Error::from(io::ErrorKind::Other))

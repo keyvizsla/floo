@@ -15,25 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use crate::{errors::FlooError, project::Project};
+use crate::{errors::FlooError, fireplace::Fireplace};
 use std::path::PathBuf;
 
 #[derive(Clone)]
 pub enum Action {
     Quit,
-    AddFireplace(Project),
-    DeleteFireplace(Project),
-    Pick(Project),
-    OpenCreationPopup(Option<Project>),
+    AddFireplace(Fireplace),
+    DeleteFireplace(Fireplace),
+    Pick(Fireplace),
+    OpenCreationPopup(Option<Fireplace>),
     ClosePopup,
-    EditNotes(Project),
-    ReplaceProject {
-        old: Project,
-        new: Project,
+    EditNotes(Fireplace),
+    ReplaceFireplace {
+        old: Fireplace,
+        new: Fireplace,
     },
     SelectTemplate {
         template: PathBuf,
-        project: Option<Project>,
+        project: Option<Fireplace>,
     },
     Error(FlooError),
     Noop,

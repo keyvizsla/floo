@@ -20,7 +20,7 @@ use crate::components::component::Component;
 use crate::components::tui::Tui;
 use crate::db_handler;
 use crate::errors::FlooError;
-use crate::project::Project;
+use crate::fireplace::Fireplace;
 use crate::state::AppState;
 use crate::utils::open_editor;
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
@@ -63,7 +63,7 @@ impl App {
     fn edit_and_apply_template(
         &mut self,
         template: &PathBuf,
-        project: &Project,
+        project: &Fireplace,
     ) -> Result<(), io::Error> {
         let file_contents = String::from_utf8(fs::read(template)?)
             .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid file contents"))?;
@@ -84,7 +84,7 @@ impl App {
         })
     }
 
-    fn output_shell_cmd(project: &Project, output_path: &PathBuf) -> Result<(), io::Error> {
+    fn output_shell_cmd(project: &Fireplace, output_path: &PathBuf) -> Result<(), io::Error> {
         let mut instructions = String::new();
 
         let project_script_path = project.directory.join(".floo");
@@ -127,7 +127,7 @@ impl App {
     /// is ran.
     pub fn run_with_prefilled_popup(
         &mut self,
-        prefill: Option<Project>,
+        prefill: Option<Fireplace>,
     ) -> Result<(), Box<dyn std::error::Error>> {
         self.tui.update(Action::OpenCreationPopup(prefill));
         self.run()
@@ -141,7 +141,7 @@ impl App {
                 let tui_update = match action.clone() {
                     Action::EditNotes(project) => {
                         if let Ok(updated_notes) = self.edit_notes(project.notes.clone()) {
-                            let new_project = Project {
+                            let new_project = Fireplace {
                                 name: project.name.clone(),
                                 directory: project.directory.clone(),
                                 notes: updated_notes.clone(),
@@ -151,7 +151,7 @@ impl App {
                                 Ok(_) => {
                                     self.state.remove_project(&project);
                                     self.state.replace_project(&project, new_project.clone());
-                                    Action::ReplaceProject {
+                                    Action::ReplaceFireplace {
                                         old: project,
                                         new: new_project,
                                     }

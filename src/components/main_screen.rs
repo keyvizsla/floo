@@ -34,14 +34,14 @@ use crate::components::new_fireplace_popup::NewFireplaceComponent;
 use crate::components::select_template::SelectTemplatePopup;
 use crate::components::status_footer::StatusFooter;
 use crate::errors::FlooError;
-use crate::project::Project;
+use crate::fireplace::Fireplace;
 use crate::utils::{get_template_dir, remove_project, replace_project};
 
 use ratatui::widgets::Widget;
 
 #[derive(Default)]
 pub struct MainScreen {
-    projects: Vec<Project>,
+    projects: Vec<Fireplace>,
     description_scroll: u16,
     tab_state: TabViewState,
     list_state: ListPickerState,
@@ -53,7 +53,7 @@ pub struct MainScreen {
 }
 
 impl MainScreen {
-    pub fn init_with_projects(projects: Vec<Project>) -> Self {
+    pub fn init_with_projects(projects: Vec<Fireplace>) -> Self {
         let mut tab_state = TabViewState::new(2);
         let mut list_state = ListPickerState::new(projects.len());
         let toast_state = ToastState::new();
@@ -72,7 +72,7 @@ impl MainScreen {
         }
     }
 
-    fn selected_project(&self) -> Project {
+    fn selected_project(&self) -> Fireplace {
         self.projects[self.list_state.selected_index].clone()
     }
 
@@ -92,7 +92,7 @@ impl MainScreen {
         }
     }
 
-    pub fn add_project(&mut self, project: Project) {
+    pub fn add_project(&mut self, project: Fireplace) {
         self.projects.push(project);
         self.list_state = ListPickerState::new(self.projects.len());
 
@@ -100,7 +100,7 @@ impl MainScreen {
         self.list_state.select_last();
     }
 
-    pub fn remove_project(&mut self, project: &Project) {
+    pub fn remove_project(&mut self, project: &Fireplace) {
         remove_project(&mut self.projects, project);
         let old_idx = self.list_state.selected_index;
         self.list_state = ListPickerState::new(self.projects.len());
@@ -330,7 +330,7 @@ impl Component for MainScreen {
                 };
                 let _ = self.creation_popup.as_mut().unwrap().init();
             }
-            Action::ReplaceProject {
+            Action::ReplaceFireplace {
                 old: old_project,
                 new: new_project,
             } => replace_project(&mut self.projects, &old_project, new_project),

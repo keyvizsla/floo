@@ -19,14 +19,14 @@ use std::fs;
 use std::path::PathBuf;
 
 #[derive(Debug, Default, Clone)]
-pub struct Project {
+pub struct Fireplace {
     pub name: String,
     pub directory: PathBuf,
     pub notes: String,
     pub last_accessed: i64,
 }
 
-impl Project {
+impl Fireplace {
     /// Return the true path to the readme file of the project.
     /// This handles different common spellings for the readme file.
     fn get_description_path(&self) -> Option<PathBuf> {
@@ -72,6 +72,7 @@ impl Project {
         return Some(description);
     }
 
+    /// Returns true iff the fireplace has an associated .floo script
     pub fn has_startup_script(&self) -> bool {
         self.directory.join(".floo").exists()
     }

@@ -25,19 +25,19 @@ use crate::{
         main_screen::MainScreen,
         start_screen::StartScreen,
     },
-    project::Project,
+    fireplace::Fireplace,
     utils::{remove_project, replace_project},
 };
 
 #[derive(Default)]
 pub struct Tui {
-    projects: Vec<Project>,
+    projects: Vec<Fireplace>,
     start_screen: StartScreen,
     main_screen: MainScreen,
 }
 
 impl Tui {
-    pub fn new(projects: Vec<Project>) -> Self {
+    pub fn new(projects: Vec<Fireplace>) -> Self {
         Self {
             projects,
             ..Default::default()
@@ -77,7 +77,7 @@ impl Component for Tui {
         match action.clone() {
             Action::AddFireplace(project) => self.projects.push(project),
             Action::DeleteFireplace(project) => remove_project(&mut self.projects, &project),
-            Action::ReplaceProject {
+            Action::ReplaceFireplace {
                 old: old_project,
                 new: new_project,
             } => replace_project(&mut self.projects, &old_project, new_project),
