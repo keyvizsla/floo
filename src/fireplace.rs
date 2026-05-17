@@ -91,8 +91,20 @@ impl Fireplace {
 
     /// Setter for the Fireplace's root directory path
     pub fn set_directory(&mut self, dir: PathBuf) -> io::Result<()> {
-        // TODO: Apply shellexpand to expand for example "~"
-        self.directory = dir.canonicalize()?;
+        let dir_str = dir.to_str();
+        if dir_str.is_none() {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidFilename,
+                "Encountered invalid UTF-8",
+            ));
+        }
+        let expanded_path = shellexpand::full(dir_str.unwrap()).map_err(|_| {
+            io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "Unable to expand some expressions",
+            )
+        })?;
+        self.directory = fs::canonicalize(expanded_path.as_ref())?;
         Ok(())
     }
 

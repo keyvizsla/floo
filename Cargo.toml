@@ -16,4 +16,5 @@ ratatui = "0.30.0"
 # ratatui-interact = { version = "0.5.3", features = ["markdown", "filesystem"] }
 ratatui-interact = { git = "https://github.com/keyvizsla/ratatui-interact", features = ["markdown", "filesystem"] }
 rusqlite = { version = "0.39.0", features = ["bundled"] }
+shellexpand = "3.1.2"
 tui-markdown = "0.3.7"
