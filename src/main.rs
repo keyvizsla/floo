@@ -46,7 +46,7 @@ fn main() -> Result<(), io::Error> {
         Some(Command::Create { path }) => {
             let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
             let mut prefill = Fireplace::default();
-            prefill.directory = path.canonicalize()?;
+            let _ = prefill.set_directory(path.clone());
             app.run_with_prefilled_popup(Some(prefill))
                 .map_err(|_| io::Error::from(io::ErrorKind::Other))
         }

@@ -68,7 +68,7 @@ impl App {
         let file_contents = String::from_utf8(fs::read(template)?)
             .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, "Invalid file contents"))?;
         let edited = open_editor(file_contents, Some(".sh".to_string()), &mut self.terminal)?;
-        fs::write(project.directory.join(".floo"), edited)?;
+        fs::write(project.get_directory().join(".floo"), edited)?;
         Ok(())
     }
 
@@ -87,19 +87,22 @@ impl App {
     fn output_shell_cmd(project: &Fireplace, output_path: &PathBuf) -> Result<(), io::Error> {
         let mut instructions = String::new();
 
-        let project_script_path = project.directory.join(".floo");
+        let project_script_path = project.get_directory().join(".floo");
 
         // Make FLOO environment variables available to .floo scripts
         instructions.push_str(&format!(
             "FLOO_DIR='{}'\n",
-            project.directory.to_str().unwrap()
+            project.get_directory().to_str().unwrap()
         ));
         instructions.push_str(&format!("FLOO_NAME='{}'\n", project.name));
 
         if project_script_path.exists() {
             instructions.push_str(&format!("source '{}'\n", project_script_path.display()));
         } else {
-            instructions.push_str(&format!("cd '{}'\n", project.directory.to_str().unwrap()));
+            instructions.push_str(&format!(
+                "cd '{}'\n",
+                project.get_directory().to_str().unwrap()
+            ));
         }
 
         std::fs::write(output_path, instructions)?;
@@ -141,12 +144,12 @@ impl App {
                 let tui_update = match action.clone() {
                     Action::EditNotes(project) => {
                         if let Ok(updated_notes) = self.edit_notes(project.notes.clone()) {
-                            let new_project = Fireplace {
-                                name: project.name.clone(),
-                                directory: project.directory.clone(),
-                                notes: updated_notes.clone(),
-                                last_accessed: project.last_accessed.clone(),
-                            };
+                            let new_project = Fireplace::new(
+                                project.name.clone(),
+                                project.get_directory(),
+                                updated_notes.clone(),
+                                project.last_accessed.clone(),
+                            );
                             match db_handler::change_notes(&project, &updated_notes) {
                                 Ok(_) => {
                                     self.state.remove_project(&project);

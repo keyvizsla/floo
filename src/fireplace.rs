@@ -15,18 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::fs;
 use std::path::PathBuf;
+use std::{fs, io};
 
 #[derive(Debug, Default, Clone)]
 pub struct Fireplace {
     pub name: String,
-    pub directory: PathBuf,
+    directory: PathBuf,
     pub notes: String,
     pub last_accessed: i64,
 }
 
 impl Fireplace {
+    /// Create a new fireplace with specific attributes
+    pub fn new(name: String, directory: PathBuf, notes: String, last_accessed: i64) -> Self {
+        let mut result = Fireplace {
+            name,
+            directory: PathBuf::default(),
+            notes,
+            last_accessed,
+        };
+        let _ = result.set_directory(directory);
+        result
+    }
+
     /// Return the true path to the readme file of the project.
     /// This handles different common spellings for the readme file.
     fn get_description_path(&self) -> Option<PathBuf> {
@@ -70,6 +82,18 @@ impl Fireplace {
         };
 
         return Some(description);
+    }
+
+    /// Getter for the Fireplace's root directory path
+    pub fn get_directory(&self) -> PathBuf {
+        self.directory.clone()
+    }
+
+    /// Setter for the Fireplace's root directory path
+    pub fn set_directory(&mut self, dir: PathBuf) -> io::Result<()> {
+        // TODO: Apply shellexpand to expand for example "~"
+        self.directory = dir.canonicalize()?;
+        Ok(())
     }
 
     /// Returns true iff the fireplace has an associated .floo script

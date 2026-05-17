@@ -54,12 +54,12 @@ pub fn get_projects() -> Result<Vec<Fireplace>> {
         )?;
 
         let project_iter = stmt.query_map([], |row| {
-            Ok(Fireplace::from(Fireplace {
-                name: row.get::<usize, String>(0)?,
-                directory: row.get::<usize, String>(1)?.into(),
-                notes: row.get::<usize, String>(2)?.into(),
-                last_accessed: row.get::<usize, i64>(3)?.into(),
-            }))
+            Ok(Fireplace::new(
+                row.get::<usize, String>(0)?,
+                row.get::<usize, String>(1)?.into(),
+                row.get::<usize, String>(2)?.into(),
+                row.get::<usize, i64>(3)?.into(),
+            ))
         })?;
 
         project_iter.collect::<Result<Vec<Fireplace>, _>>()?
@@ -77,7 +77,7 @@ pub fn add_project(project: Fireplace) -> Result<()> {
     )?;
     stmt.execute(params![
         project.name,
-        project.directory.to_str(),
+        project.get_directory().to_str(),
         project.notes,
         project.last_accessed,
     ])?;

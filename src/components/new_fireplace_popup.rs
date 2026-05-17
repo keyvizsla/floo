@@ -43,8 +43,8 @@ impl NewFireplaceComponent {
 
     pub fn with_prefill(project: Fireplace) -> Self {
         let mut popup_content = PopupContent::default();
-        popup_content.name.text = project.name;
-        popup_content.directory.text = project.directory.to_str().unwrap().to_string();
+        popup_content.name.text = project.name.clone();
+        popup_content.directory.text = project.get_directory().to_str().unwrap().to_string();
         Self {
             dialog_state: DialogState::new(popup_content),
         }
@@ -126,14 +126,14 @@ impl NewFireplaceComponent {
                     } else if key_code == KeyCode::Up {
                         self.dialog_state.focus.set(DialogFocusTarget::Child(1));
                     } else if is_enter(key) {
-                        let new_project = Fireplace {
-                            name: content.name.text.clone(),
-                            directory: PathBuf::from(content.directory.text.clone())
+                        let new_project = Fireplace::new(
+                            content.name.text.clone(),
+                            PathBuf::from(content.directory.text.clone())
                                 .canonicalize()
                                 .unwrap_or_else(|_| PathBuf::from(content.directory.text.clone())),
-                            notes: String::new(),
-                            last_accessed: 0,
-                        };
+                            String::new(),
+                            0,
+                        );
                         return Action::AddFireplace(new_project);
                     }
                 }
