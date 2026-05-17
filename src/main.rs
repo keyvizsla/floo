@@ -23,7 +23,7 @@ use crate::{
     app::App,
     cli::{Cli, Command},
     project::Project,
-    utils::init_sys,
+    utils::{edit_and_save_template, init_sys},
 };
 
 mod action;
@@ -49,6 +49,14 @@ fn main() -> Result<(), io::Error> {
             prefill.directory = path.canonicalize()?;
             app.run_with_prefilled_popup(Some(prefill))
                 .map_err(|_| io::Error::from(io::ErrorKind::Other))
+        }
+        Some(Command::Template { filepath, name }) => {
+            let res = edit_and_save_template(filepath.to_path_buf(), name.to_string());
+            match res {
+                Ok(_) => println!("Successfully saved your new template."),
+                Err(_) => eprintln!("Failed to save you new template."),
+            };
+            res
         }
         None => {
             let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;

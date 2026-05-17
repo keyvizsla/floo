@@ -2,8 +2,11 @@ use std::path::PathBuf;
 
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
 use ratatui::{Frame, layout::Rect};
-use ratatui_interact::prelude::{
-    DialogConfig, DialogFocusTarget, DialogState, FileExplorer, FileExplorerState, PopupDialog,
+use ratatui_interact::{
+    components::file_explorer::{FileExplorerMode, FooterBuilder},
+    prelude::{
+        DialogConfig, DialogFocusTarget, DialogState, FileExplorer, FileExplorerState, PopupDialog,
+    },
 };
 
 use crate::{
@@ -14,6 +17,7 @@ use crate::{
 pub struct SelectTemplatePopup {
     dialog_state: DialogState<PopupContent>,
     filepicker_state: FileExplorerState,
+    keybind_footer: FooterBuilder,
 }
 
 impl SelectTemplatePopup {
@@ -21,20 +25,42 @@ impl SelectTemplatePopup {
         Self {
             dialog_state: DialogState::new(PopupContent::default()),
             filepicker_state: FileExplorerState::new(template_dir),
+            keybind_footer: FooterBuilder::new()
+                .with_keybind(
+                    FileExplorerMode::Browse,
+                    "↑↓/jk".to_string(),
+                    ":Move".to_string(),
+                )
+                .with_keybind(
+                    FileExplorerMode::Browse,
+                    "-".to_string(),
+                    ":Go Up".to_string(),
+                )
+                .with_keybind(
+                    FileExplorerMode::Browse,
+                    ".".to_string(),
+                    ":Hidden".to_string(),
+                )
+                .with_keybind(
+                    FileExplorerMode::Browse,
+                    "Enter".to_string(),
+                    ":Select".to_string(),
+                ),
         }
     }
 
     fn render_dialog(&mut self, f: &mut Frame, area: Rect) {
-        let config = DialogConfig::new("Help - Exit with `q`")
+        let config = DialogConfig::new("Select a template to apply - Exit with `q`")
             .max_size(area.width, area.height)
-            .ok_cancel();
+            .no_buttons();
 
         let mut dialog =
             PopupDialog::new(&config, &mut self.dialog_state, |frame, area, _content| {
                 let visible_height = area.height.saturating_sub(2) as usize;
                 self.filepicker_state.ensure_visible(visible_height);
 
-                let picker = FileExplorer::new(&self.filepicker_state);
+                let picker = FileExplorer::new(&self.filepicker_state)
+                    .footer_builder(self.keybind_footer.clone());
                 frame.render_widget(picker, area);
             });
         dialog.render(f);
@@ -111,23 +137,23 @@ impl Component for SelectTemplatePopup {
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
-        let focus_target = self.dialog_state.current_focus().cloned();
+        // let focus_target = self.dialog_state.current_focus().cloned();
         match key.code {
-            KeyCode::Tab => {
-                if let Some(DialogFocusTarget::Child(_)) = focus_target {
-                    self.dialog_state.focus.set(DialogFocusTarget::Button(0));
-                    return Action::Noop;
-                }
-                if let Some(DialogFocusTarget::Button(0)) = focus_target {
-                    self.dialog_state.focus.set(DialogFocusTarget::Button(1));
-                    return Action::Noop;
-                }
-                if let Some(DialogFocusTarget::Button(1)) = focus_target {
-                    self.dialog_state.focus.set(DialogFocusTarget::Button(0));
-                    return Action::Noop;
-                }
-                return Action::Noop;
-            }
+            // KeyCode::Tab => {
+            //     if let Some(DialogFocusTarget::Child(_)) = focus_target {
+            //         self.dialog_state.focus.set(DialogFocusTarget::Button(0));
+            //         return Action::Noop;
+            //     }
+            //     if let Some(DialogFocusTarget::Button(0)) = focus_target {
+            //         self.dialog_state.focus.set(DialogFocusTarget::Button(1));
+            //         return Action::Noop;
+            //     }
+            //     if let Some(DialogFocusTarget::Button(1)) = focus_target {
+            //         self.dialog_state.focus.set(DialogFocusTarget::Button(0));
+            //         return Action::Noop;
+            //     }
+            //     return Action::Noop;
+            // }
             KeyCode::Char('q') => Action::ClosePopup,
             _ => {
                 // handle_scrollable_content_key(&mut self.content_state, &key, 1);

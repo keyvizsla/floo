@@ -29,10 +29,11 @@ care of for you.
 
 ## Installation
 
-## Bugs and Feature Requests
+## Known Limitations
+
+- When applying a template, it is applied regardless whether or not the user has saved their modifications to the template. That is, if they just quit the editor without saving, the default template is applied, whereas it would be preferrable to instead not apply anything at all. If this happens to you and you did not intend to apply the template, simply run `rm .floo` in the fireplace's directory.
 
 ## News
-
 
 <Meaningful usage gif highlighting most important feature>
 
