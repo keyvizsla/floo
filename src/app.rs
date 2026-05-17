@@ -28,13 +28,11 @@ use crossterm::terminal::{
     EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
 };
 use crossterm::{event, execute};
-use edit::Builder;
 use ratatui::{Terminal, backend::CrosstermBackend};
-use std::io::{self, Stdout, stdout};
+use std::io::{self, Stdout};
 use std::path::PathBuf;
 use std::{env, fs};
 
-use ratatui::crossterm::ExecutableCommand;
 
 pub struct AppCreationError {}
 pub struct App {

@@ -2,8 +2,11 @@ use std::path::PathBuf;
 
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
 use ratatui::{Frame, layout::Rect};
-use ratatui_interact::prelude::{
-    DialogConfig, DialogFocusTarget, DialogState, FileExplorer, FileExplorerState, PopupDialog,
+use ratatui_interact::{
+    components::file_explorer::{FileExplorerMode, FooterBuilder},
+    prelude::{
+        DialogConfig, DialogFocusTarget, DialogState, FileExplorer, FileExplorerState, PopupDialog,
+    },
 };
 
 use crate::{
@@ -14,6 +17,7 @@ use crate::{
 pub struct SelectTemplatePopup {
     dialog_state: DialogState<PopupContent>,
     filepicker_state: FileExplorerState,
+    keybind_footer: FooterBuilder,
 }
 
 impl SelectTemplatePopup {
@@ -21,6 +25,27 @@ impl SelectTemplatePopup {
         Self {
             dialog_state: DialogState::new(PopupContent::default()),
             filepicker_state: FileExplorerState::new(template_dir),
+            keybind_footer: FooterBuilder::new()
+                .with_keybind(
+                    FileExplorerMode::Browse,
+                    "↑↓/jk".to_string(),
+                    ":Move".to_string(),
+                )
+                .with_keybind(
+                    FileExplorerMode::Browse,
+                    "-".to_string(),
+                    ":Go Up".to_string(),
+                )
+                .with_keybind(
+                    FileExplorerMode::Browse,
+                    ".".to_string(),
+                    ":Hidden".to_string(),
+                )
+                .with_keybind(
+                    FileExplorerMode::Browse,
+                    "Enter".to_string(),
+                    ":Select".to_string(),
+                ),
         }
     }
 
@@ -34,7 +59,8 @@ impl SelectTemplatePopup {
                 let visible_height = area.height.saturating_sub(2) as usize;
                 self.filepicker_state.ensure_visible(visible_height);
 
-                let picker = FileExplorer::new(&self.filepicker_state);
+                let picker = FileExplorer::new(&self.filepicker_state)
+                    .footer_builder(self.keybind_footer.clone());
                 frame.render_widget(picker, area);
             });
         dialog.render(f);
