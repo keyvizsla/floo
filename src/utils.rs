@@ -21,6 +21,9 @@ use crossterm::{
 };
 use edit::Builder;
 use ratatui::{Terminal, prelude::CrosstermBackend};
+use reqwest::blocking::get;
+use serde::Deserialize;
+use std::path::Path;
 
 use crate::fireplace::Fireplace;
 use std::{
@@ -35,7 +38,11 @@ pub fn remove_project(projects: &mut Vec<Fireplace>, project_to_delete: &Firepla
     projects.retain(|p| p.name != project_to_delete.name);
 }
 
-pub fn replace_project(projects: &mut Vec<Fireplace>, old_project: &Fireplace, new_project: Fireplace) {
+pub fn replace_project(
+    projects: &mut Vec<Fireplace>,
+    old_project: &Fireplace,
+    new_project: Fireplace,
+) {
     for i in 0..projects.len() {
         if projects[i].name == old_project.name {
             projects[i] = new_project.clone();
@@ -97,7 +104,11 @@ pub fn appdata_dir() -> PathBuf {
 /// Return the path to the default/configured
 /// directory containing template startup scripts.
 pub fn get_template_dir() -> PathBuf {
-    appdata_dir().join("templates")
+    let template_dir = appdata_dir().join("templates");
+    if !template_dir.exists() {
+        std::fs::create_dir_all(&template_dir).expect("Failed to create template directory");
+    }
+    template_dir
 }
 
 /// Open the editor and return the edited contents
@@ -133,4 +144,59 @@ pub fn edit_and_save_template(filepath: PathBuf, template_name: String) -> Resul
     let target_path = get_template_dir().join(template_name);
     fs::write(target_path, edited)?;
     Ok(())
+}
+
+#[derive(Deserialize)]
+struct GithubFileEntry {
+    name: String,
+    path: String,
+    #[serde(rename = "type")]
+    kind: String,
+    download_url: Option<String>,
+}
+
+/// Install the default .floo templates from github
+pub fn install_default_templates() {
+    download_github_dir(
+        "https://api.github.com/repos/keyvizsla/floo/contents/templates",
+        &get_template_dir(),
+    )
+}
+
+fn download_github_dir(api_url: &str, dest: &Path) {
+    let client = reqwest::blocking::Client::new();
+    let error_msg = "Failed to download some refs.";
+
+    let entries: Vec<GithubFileEntry> = client
+        .get(api_url)
+        .header("User-Agent", "reqwest")
+        .send()
+        .expect(error_msg)
+        .json()
+        .expect(error_msg);
+
+    for entry in entries {
+        match entry.kind.as_str() {
+            "file" => {
+                let bytes = get(entry.download_url.unwrap())
+                    .expect(error_msg)
+                    .bytes()
+                    .expect(error_msg);
+
+                fs::write(dest.join(entry.name), bytes).expect(error_msg);
+            }
+
+            "dir" => {
+                download_github_dir(
+                    &format!(
+                        "https://api.github.com/repos/keyvizsla/floo/contents/{}",
+                        entry.path
+                    ),
+                    &dest.join(entry.name),
+                );
+            }
+
+            _ => {}
+        }
+    }
 }

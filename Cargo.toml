@@ -18,3 +18,5 @@ ratatui-interact = { git = "https://github.com/keyvizsla/ratatui-interact", feat
 rusqlite = { version = "0.39.0", features = ["bundled"] }
 shellexpand = "3.1.2"
 tui-markdown = "0.3.7"
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+serde = { version = "1", features = ["derive"] }
