@@ -33,7 +33,6 @@ use std::io::{self, Stdout};
 use std::path::PathBuf;
 use std::{env, fs};
 
-
 pub struct AppCreationError {}
 pub struct App {
     state: AppState,
@@ -89,6 +88,14 @@ impl App {
         let mut instructions = String::new();
 
         let project_script_path = project.directory.join(".floo");
+
+        // Make FLOO environment variables available to .floo scripts
+        instructions.push_str(&format!(
+            "FLOO_DIR='{}'\n",
+            project.directory.to_str().unwrap()
+        ));
+        instructions.push_str(&format!("FLOO_NAME='{}'\n", project.name));
+
         if project_script_path.exists() {
             instructions.push_str(&format!("source '{}'\n", project_script_path.display()));
         } else {
