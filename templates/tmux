@@ -24,37 +24,34 @@
 # You may also choose to add things like sourcing specific .env files
 # or similar in each session.
 
-# Replace this for example with the name of your fireplace
-SESSION_NAME="my-tmux-session"
-
-tmux has-session -t $SESSION_NAME 2>/dev/null
+tmux has-session -t "$FLOO_NAME" 2>/dev/null
 
 if [ $? != 0 ]; then
-    echo "Creating new session: $SESSION_NAME"
+    echo "Creating new session: $FLOO_NAME"
 
-    # Create the session and name the first window
-    tmux new-session -d -s $SESSION_NAME
+    # Create the session in the fireplace's directory
+    tmux new-session -d -s "$FLOO_NAME" -c "$FLOO_DIR"
 
     # Run command in Window 1
-    tmux send-keys -t $SESSION_NAME:0 "$EDITOR ." C-m
+    tmux send-keys -t "$FLOO_NAME":0 "$EDITOR ." C-m
 
     # Create the second window
-    tmux new-window -t $SESSION_NAME
+    tmux new-window -t "$FLOO_NAME"
 
     # Reset focus to the first window
-    tmux select-window -t $SESSION_NAME:1
+    tmux select-window -t "$FLOO_NAME":1
 else
-    echo "Session $SESSION_NAME already exists."
+    echo "Session $FLOO_NAME already exists."
 fi
 
 # 2. Handle Attachment/Transition
 if [ -n "$TMUX" ]; then
     # If we are already inside tmux, switch the current client to the new session
     # This prevents the script from hanging or closing prematurely
-    echo "Switching current tmux client to $SESSION_NAME..."
-    tmux switch-client -t $SESSION_NAME
+    echo "Switching current tmux client to $FLOO_NAME..."
+    tmux switch-client -t "$FLOO_NAME"
 else
     # If we are in a regular terminal, attach normally
-    echo "Attaching to $SESSION_NAME..."
-    tmux attach-session -t $SESSION_NAME
+    echo "Attaching to $FLOO_NAME..."
+    tmux attach-session -t "$FLOO_NAME"
 fi
