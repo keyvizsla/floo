@@ -15,16 +15,17 @@ categories = ["command-line-interface", "command-line-utilities", "development-t
 name = "floo-bin"
 path = "src/main.rs"
 
+[features]
+bundled = ["rusqlite/bundled"]
+
 [dependencies]
 clap = { version = "4.6.1", features = ["derive"] }
 crossterm = "0.29.0"
 edit = "0.1.5"
 ratatui = "0.30.0"
-# Disabled until potentially the upstream incoroporates our changes
-# ratatui-interact = { version = "0.5.3", features = ["markdown", "filesystem"] }
 ratatui-interact = { version = "0.5.3-fork.1", features = ["markdown", "filesystem"], package = "ratatui-interact-fork" }
-rusqlite = { version = "0.39.0", features = ["bundled"] }
 shellexpand = "3.1.2"
 tui-markdown = "0.3.7"
-reqwest = { version = "0.12", features = ["blocking", "json"] }
 serde = { version = "1", features = ["derive"] }
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+rusqlite = { version = "0.39.0" }
