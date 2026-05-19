@@ -41,9 +41,12 @@ if [ $? -eq 0 ]; then
     tar -xzf "$FILE"
     sudo mv floo-bin /usr/local/bin/
     echo "🚀 Installed successfully to /usr/local/bin/"
+    floo-bin install-templates ./templates
+    echo "🚀 Installed default floo templates"
 
     # Cleanup
     rm "$FILE" "$CHECKSUM_FILE"
+    rm -rf ./templates
 else
     echo "❌ CHECKSUM FAILED! The file may be corrupted or tampered with."
     exit 1
