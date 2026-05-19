@@ -42,6 +42,13 @@ curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/keyvizsl
 
 To see a list of releases for your favorite package manager, consult [the official installation](https://keyvizsla.github.io/floo/guide/installation.html) docs.
 
+Note: When installing from crates.io, make sure to follow the instructions from the official documentation.
+In particular, add the following to your shell's rc file (.bashrc/.zshrc) after `cargo install`:
+
+```sh
+eval "$(floo-bin init)"
+```
+
 ### Building from source
 
 Requirements: cargo.

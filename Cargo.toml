@@ -2,6 +2,14 @@
 name = "floo"
 version = "0.1.0-beta.0"
 edition = "2024"
+description = "Effortless travel to and from workspaces"
+documentation = "https://keyvizsla.github.io/floo"
+homepage = "https://keyvizsla.github.io/floo"
+readme = "README.md"
+repository = "https://github.com/keyvizsla/floo"
+license = "GPL-3.0"
+keywords = ["tui", "ratatui", "utility", "workspace", "developer-tools"]
+categories = ["command-line-interface", "command-line-utilities", "development-tools", "filesystem"]
 
 [[bin]]
 name = "floo-bin"
@@ -14,7 +22,7 @@ edit = "0.1.5"
 ratatui = "0.30.0"
 # Disabled until potentially the upstream incoroporates our changes
 # ratatui-interact = { version = "0.5.3", features = ["markdown", "filesystem"] }
-ratatui-interact = { git = "https://github.com/keyvizsla/ratatui-interact", features = ["markdown", "filesystem"] }
+ratatui-interact = { version = "0.5.3-fork.1", features = ["markdown", "filesystem"], package = "ratatui-interact-fork" }
 rusqlite = { version = "0.39.0", features = ["bundled"] }
 shellexpand = "3.1.2"
 tui-markdown = "0.3.7"
