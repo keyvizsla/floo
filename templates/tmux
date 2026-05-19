@@ -36,7 +36,7 @@ if [ $? != 0 ]; then
     tmux send-keys -t "$FLOO_NAME":0 "$EDITOR ." C-m
 
     # Create the second window
-    tmux new-window -t "$FLOO_NAME"
+    tmux new-window -t "$FLOO_NAME" -c "$FLOO_DIR"
 
     # Reset focus to the first window
     tmux select-window -t "$FLOO_NAME":1
