@@ -200,3 +200,28 @@ fn download_github_dir(api_url: &str, dest: &Path) {
         }
     }
 }
+
+pub fn install_local_templates(template_dir: &PathBuf) {
+    copy_dir_all(template_dir, get_template_dir()).expect("Failed to install local templates.")
+}
+
+fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
+    let src = src.as_ref();
+    let dst = dst.as_ref();
+
+    fs::create_dir_all(dst)?;
+
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let file_type = entry.file_type()?;
+
+        let target_path = dst.join(entry.file_name());
+
+        if file_type.is_dir() {
+            copy_dir_all(entry.path(), target_path)?;
+        } else {
+            fs::copy(entry.path(), target_path)?;
+        }
+    }
+    Ok(())
+}

@@ -18,7 +18,10 @@ fi
 # Build and install floo-bin from source
 cargo install --path .
 
-# TODO: Install templates from local (for this we want floo-bin to output its storage path)
+# Install default floo templates
+floo-bin install-templates --local ./templates
+
+# Prepare shell environment
 
 INIT_LINE='eval "$(floo-bin init)"'
 

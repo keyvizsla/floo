@@ -24,7 +24,7 @@ fi
 echo "Starting installation for detected architecture: $OS-$ARCH..."
 
 # Update this to the latest tag always
-VERSION="v0.1.0"
+VERSION="v0.1.0-beta.0"
 FILE="floo-$OS-$ARCH.tar.gz"
 CHECKSUM_FILE="checksums.txt"
 BASE_URL="https://codeberg.org/KeyVizsla/floo/releases/download/$VERSION"
@@ -41,9 +41,12 @@ if [ $? -eq 0 ]; then
     tar -xzf "$FILE"
     sudo mv floo-bin /usr/local/bin/
     echo "🚀 Installed successfully to /usr/local/bin/"
+    floo-bin install-templates ./templates
+    echo "🚀 Installed default floo templates"
 
     # Cleanup
     rm "$FILE" "$CHECKSUM_FILE"
+    rm -rf ./templates
 else
     echo "❌ CHECKSUM FAILED! The file may be corrupted or tampered with."
     exit 1

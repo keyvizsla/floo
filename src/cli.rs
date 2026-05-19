@@ -25,7 +25,7 @@ use std::path::PathBuf;
     version,
     author = "Leon Degel-Koehn <leon.koehn2002@gmail.com>",
     about = "Effortless travel to and from workspaces",
-    after_help = "Fireplace homepage: https://keyvizsla.github.io/floo\nRepository: https://github.com/keyvizsla/floo",
+    after_help = "Homepage: https://keyvizsla.github.io/floo\nRepository: https://github.com/keyvizsla/floo",
     help_template = "{before-help}{name} {version}{author-section}{about-section}\n{usage-heading} {usage}\n\n{all-args}{after-help}"
 )]
 pub struct Cli {
@@ -54,6 +54,10 @@ pub enum Command {
         name: String,
     },
 
-    /// Install the default floo templates (this will override local templates of the same name)
-    InstallTemplates,
+    /// Install floo templates (will override local templates of the same name unless --local is used)
+    InstallTemplates {
+        /// Install templates from a local directory instead of remote (e.g. .../floo/templates)
+        #[arg(long, value_name = "PATH")]
+        local: Option<PathBuf>,
+    },
 }

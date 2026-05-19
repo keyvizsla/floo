@@ -23,7 +23,7 @@ use crate::{
     app::App,
     cli::{Cli, Command},
     fireplace::Fireplace,
-    utils::{edit_and_save_template, init_sys, install_default_templates},
+    utils::{edit_and_save_template, init_sys, install_default_templates, install_local_templates},
 };
 
 mod action;
@@ -59,8 +59,12 @@ fn main() -> Result<(), io::Error> {
             };
             res
         }
-        Some(Command::InstallTemplates) => {
-            install_default_templates();
+        Some(Command::InstallTemplates { local }) => {
+            if let Some(template_path) = local {
+                install_local_templates(template_path);
+            } else {
+                install_default_templates();
+            }
             println!("Successfully installed all default floo templates.");
             Ok(())
         }
