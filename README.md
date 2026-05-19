@@ -22,7 +22,16 @@ Via the tui of **floo** you can select a fireplace to travel to, upon which
 the exact state you need it in for that project. This means **floo** can
 set environment variables, open tmux sessions, editors, browsers, you name it,
 whatever you needed to manually do to get going on a project, **floo** can take
-care of for you.
+care of for you. 
+Per default, upon selecting a fireplace, **floo** acts as if you were to perform
+the following actions manually in your terminal:
+1. Close **floo**
+2. cd into the directory of the fireplace
+3. source any .env or .envrc files
+
+The default actions can be overriden on a per fireplace basis
+by placing a `.floo` script in the directory to which your fireplace points.
+For more information read [the official documentation](https://keyvizsla.github.io/floo).
 
 ## Example
 
@@ -34,32 +43,14 @@ care of for you.
 
 ## Installing the latest stable version
 
-Generally, the preferred way of installing the latest stable release for your platform is by running the following command:
-
-```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/keyvizsla/floo/main/scripts/install_latest.sh | sh
-```
-
-To see a list of releases for your favorite package manager, consult [the official installation](https://keyvizsla.github.io/floo/guide/installation.html) docs.
-
-Note: When installing from crates.io, make sure to follow the instructions from the official documentation.
-In particular, add the following to your shell's rc file (.bashrc/.zshrc) after `cargo install`:
-
+Currently the preferred way of installing floo is through [cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) (`cargo install floo`).
+Afterwards, add the following to your shell's rc file (.bashrc/.zshrc):
 ```sh
 eval "$(floo-bin init)"
 ```
+And restart your terminal.
 
-### Building from source
-
-Requirements: cargo.
-
-We have placed a convenience script in the scripts directory, to install from source without
-further modifications, so you can just run the following:
-```sh
-git clone https://github.com/keyvizsla/floo.git
-cd floo
-$SHELL ./scripts/install_local.sh
-```
+*Note: We are planning to release to other package managers in the future.*
 
 ## Known Limitations
 
@@ -70,4 +61,4 @@ $SHELL ./scripts/install_local.sh
 ## Contributing
 
 Thanks for being interested in becoming involved in the development and improvement of `floo`.
-Check out our [contributing guide](https://keyvizsla.github.io/floo/guide/contributing.html) and see how you can get started.
+Check out our [contributing guide](https://keyvizsla.github.io/floo/guide/contributing.html) and see how you can help.
