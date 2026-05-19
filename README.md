@@ -3,6 +3,7 @@
 <p align="center">
   <img src="assets/logo_small.png" /><br/>
   <img src="https://github.com/keyvizsla/floo/actions/workflows/deploy_pages.yaml/badge.svg" />
+  <img src="https://github.com/keyvizsla/floo/actions/workflows/run_tests.yaml/badge.svg" />
 </p>
 
 ## What is floo
