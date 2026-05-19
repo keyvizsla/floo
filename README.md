@@ -9,7 +9,7 @@
 
 Inspired by the concept of the floo network of a popular fantasy franchise,
 **floo** provides you with a central interface to quickly travel between
-workspaces and projects, relieving you of manual navigation and setup of
+workspaces and projects, relieving you of tedious manual navigation and setup of
 environments in your terminal.
 
 ## How it works
