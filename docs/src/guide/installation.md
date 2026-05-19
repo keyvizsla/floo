@@ -5,7 +5,7 @@
 Installing the latest release is as easy as running the following in your terminal:
 
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/keyvizsla/floo/main/scripts/install.sh | sh
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/keyvizsla/floo/main/scripts/install_latest.sh | sh
 ```
 
 Afterwards, you should restart your terminal or source your `.bashrc` or `.zshrc` for the changes

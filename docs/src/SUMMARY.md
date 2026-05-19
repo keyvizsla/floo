@@ -14,6 +14,9 @@
 - [Working with templates](guide/templates.md)
 - [Command-line interface](cli/README.md)
 
+# Contributing
+- [Contributing](guide/contributing.md)
+
 # Screenshots
 
 ------------------------

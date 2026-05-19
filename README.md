@@ -27,20 +27,39 @@ care of for you.
 
 [Manual](https://keyvizsla.github.io/floo/index.html)
 
-## Installation
+## Installing the latest stable version
+
+Generally, the preferred way of installing the latest stable release for your platform is by running the following command:
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/keyvizsla/floo/main/scripts/install_latest.sh | sh
+```
+
+To see a list of releases for your favorite package manager, consult [the official installation](https://keyvizsla.github.io/floo/guide/installation.html) docs.
+
+### Building from source
+
+Requirements: cargo.
+
+We have placed a convenience script in the scripts directory, to install from source without
+further modifications, so you can just run the following:
+```sh
+git clone https://github.com/keyvizsla/floo.git
+cd floo
+$SHELL ./scripts/install_local.sh
+```
 
 ## Known Limitations
 
+- `floo` currently is only expected to work on linux and mac systems.
+- `floo` is expected not to work correctly with any shells other than `bash` and `zsh`.
 - When applying a template, it is applied regardless whether or not the user has saved their modifications to the template. That is, if they just quit the editor without saving, the default template is applied, whereas it would be preferrable to instead not apply anything at all. If this happens to you and you did not intend to apply the template, simply run `rm .floo` in the fireplace's directory.
 
 ## News
 
 <Meaningful usage gif highlighting most important feature>
 
-<Maybe getting started guide or just a pages reference>
+## Contributing
 
-<Contributing>
-
-<Feedback?>
-
-<License>
+Thanks for being interested in becoming involved in the development and improvement of `floo`.
+Check out our [contributing guide](https://keyvizsla.github.io/floo/guide/contributing.html) and see how you can get started.
