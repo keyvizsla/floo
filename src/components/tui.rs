@@ -83,8 +83,11 @@ impl Component for Tui {
             } => replace_project(&mut self.projects, &old_project, new_project),
             _ => {}
         }
-        self.main_screen.update(action.clone());
-        self.start_screen.update(action);
+        if self.projects.len() > 0 {
+            self.main_screen.update(action.clone());
+        } else {
+            self.start_screen.update(action);
+        }
         Action::Noop
     }
 
