@@ -24,6 +24,10 @@ set environment variables, open tmux sessions, editors, browsers, you name it,
 whatever you needed to manually do to get going on a project, **floo** can take
 care of for you.
 
+## Example
+
+<Screen recording>
+
 ## Resources
 
 [Manual](https://keyvizsla.github.io/floo/index.html)
@@ -55,10 +59,6 @@ $SHELL ./scripts/install_local.sh
 - `floo` currently is only expected to work on linux and mac systems.
 - `floo` is expected not to work correctly with any shells other than `bash` and `zsh`.
 - When applying a template, it is applied regardless whether or not the user has saved their modifications to the template. That is, if they just quit the editor without saving, the default template is applied, whereas it would be preferrable to instead not apply anything at all. If this happens to you and you did not intend to apply the template, simply run `rm .floo` in the fireplace's directory.
-
-## News
-
-<Meaningful usage gif highlighting most important feature>
 
 ## Contributing
 

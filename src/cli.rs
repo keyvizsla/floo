@@ -54,6 +54,10 @@ pub enum Command {
         name: String,
     },
 
-    /// Install the default floo templates (this will override local templates of the same name)
-    InstallTemplates,
+    /// Install floo templates (will override local templates of the same name unless --local is used)
+    InstallTemplates {
+        /// Install templates from a local directory instead of remote (e.g. .../floo/templates)
+        #[arg(long, value_name = "PATH")]
+        local: Option<PathBuf>,
+    },
 }
