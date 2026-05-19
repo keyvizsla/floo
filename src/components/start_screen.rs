@@ -144,7 +144,7 @@ impl Component for StartScreen {
     ██║     ███████╗╚██████╔╝╚██████╔╝
     ╚═╝     ╚══════╝ ╚═════╝  ╚═════╝ ";
         let version_hint = Span::styled(
-            " v0.1.0",
+            " v0.1.0-beta.0",
             Style::default()
                 .fg(Color::DarkGray)
                 .add_modifier(Modifier::ITALIC),

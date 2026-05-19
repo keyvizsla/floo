@@ -24,7 +24,7 @@ fi
 echo "Starting installation for detected architecture: $OS-$ARCH..."
 
 # Update this to the latest tag always
-VERSION="v0.1.0"
+VERSION="v0.1.0-beta.0"
 FILE="floo-$OS-$ARCH.tar.gz"
 CHECKSUM_FILE="checksums.txt"
 BASE_URL="https://codeberg.org/KeyVizsla/floo/releases/download/$VERSION"
