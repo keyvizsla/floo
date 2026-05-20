@@ -53,14 +53,11 @@ impl Fireplace {
 
         for supported_variant in supported_variants {
             let readme_path = self.directory.join(supported_variant);
-            match fs::exists(&readme_path) {
-                Ok(true) => {
-                    return Some(readme_path);
-                }
-                _ => {}
+            if let Ok(true) = fs::exists(&readme_path) {
+                return Some(readme_path);
             }
         }
-        return None;
+        None
     }
 
     /// Get the description(readme contents) of the given project
@@ -81,7 +78,7 @@ impl Fireplace {
             }
         };
 
-        return Some(description);
+        Some(description)
     }
 
     /// Getter for the Fireplace's root directory path

@@ -1,7 +1,10 @@
-name: "Tests"
+name: "Tests & Code Quality"
 
 on:
   push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "main" ]
 
 permissions:
   contents: write
@@ -9,7 +12,7 @@ permissions:
   id-token: write
 
 jobs:
-  test:
+  run_test_check_code_quality:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,3 +30,7 @@ jobs:
       - name: Run Unittests
         run: |
           cargo test
+
+      - name: Check Code Quality
+        run: |
+          cargo clippy -- --deny warnings

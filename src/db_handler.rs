@@ -40,7 +40,7 @@ pub fn get_safe_db_connection() -> Result<Connection> {
         (),
     )?;
 
-    return Ok(conn);
+    Ok(conn)
 }
 
 // Return a list of projects in the local database.
@@ -57,8 +57,8 @@ pub fn get_projects() -> Result<Vec<Fireplace>> {
             Ok(Fireplace::new(
                 row.get::<usize, String>(0)?,
                 row.get::<usize, String>(1)?.into(),
-                row.get::<usize, String>(2)?.into(),
-                row.get::<usize, i64>(3)?.into(),
+                row.get::<usize, String>(2)?,
+                row.get::<usize, i64>(3)?,
             ))
         })?;
 
@@ -114,10 +114,10 @@ pub fn set_last_accessed_to_now(project: &Fireplace) -> Result<()> {
 /// of the database based on environment configuration.
 fn db_filepath() -> PathBuf {
     let path = env::var("FLOO_DB_PATH").ok().map(PathBuf::from);
-    if path.is_some() {
-        return path.unwrap();
+    if let Some(resolved_path) = path {
+        return resolved_path;
     }
 
     let floo_directory = appdata_dir();
-    return floo_directory.join(".floo.db");
+    floo_directory.join(".floo.db")
 }

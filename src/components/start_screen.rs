@@ -98,7 +98,7 @@ impl Component for StartScreen {
             KeyCode::Char('n') | KeyCode::Char('%') => {
                 self.creation_popup = Some(NewFireplaceComponent::new());
                 let _ = self.creation_popup.as_mut().unwrap().init();
-                return Action::Noop;
+                Action::Noop
             }
             KeyCode::Char('q') => Action::Quit,
             _ => Action::Noop,

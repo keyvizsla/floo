@@ -56,10 +56,10 @@ impl Component for Tui {
     fn handle_events(&mut self, event: Option<Event>) -> Action {
         // For now the base tui has to do no own handling
         // it just passes events up to the base app
-        if self.projects.len() > 0 {
-            self.main_screen.handle_events(event)
-        } else {
+        if self.projects.is_empty() {
             self.start_screen.handle_events(event)
+        } else {
+            self.main_screen.handle_events(event)
         }
     }
 
@@ -83,19 +83,19 @@ impl Component for Tui {
             } => replace_project(&mut self.projects, &old_project, new_project),
             _ => {}
         }
-        if self.projects.len() > 0 {
-            self.main_screen.update(action.clone());
-        } else {
+        if self.projects.is_empty() {
             self.start_screen.update(action);
+        } else {
+            self.main_screen.update(action.clone());
         }
         Action::Noop
     }
 
     fn render(&mut self, f: &mut Frame, rect: Rect) {
-        if self.projects.len() > 0 {
-            self.main_screen.render(f, rect);
-        } else {
+        if self.projects.is_empty() {
             self.start_screen.render(f, rect);
+        } else {
+            self.main_screen.render(f, rect);
         }
     }
 }
