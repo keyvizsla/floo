@@ -43,9 +43,9 @@ pub fn replace_project(
     old_project: &Fireplace,
     new_project: Fireplace,
 ) {
-    for i in 0..projects.len() {
-        if projects[i].name == old_project.name {
-            projects[i] = new_project.clone();
+    for project in projects {
+        if project.name == old_project.name {
+            *project = new_project;
             return;
         }
     }
@@ -89,8 +89,8 @@ pub fn longest_line(text: &str) -> usize {
 
 pub fn appdata_dir() -> PathBuf {
     let path = env::var("XDG_DATA_HOME").ok().map(PathBuf::from);
-    if path.is_some() {
-        return path.unwrap();
+    if let Some(resolved_path) = path {
+        return resolved_path;
     }
     let home_directory =
         PathBuf::from(env::var("HOME").expect("Cannot deduce apdata path without HOME directory"));
