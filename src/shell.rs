@@ -15,7 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::{io, path::PathBuf};
+use std::{
+    io,
+    path::{Path, PathBuf},
+};
 
 use crate::fireplace::Fireplace;
 
@@ -35,7 +38,7 @@ pub fn output_shell_cmd(fireplace: &Fireplace, output_path: &PathBuf) -> io::Res
     Ok(())
 }
 
-fn set_custom_floo_script(script: &mut String, fireplace: &Fireplace, floo_script_path: &PathBuf) {
+fn set_custom_floo_script(script: &mut String, fireplace: &Fireplace, floo_script_path: &Path) {
     set_floo_env(script, fireplace);
     script.push_str(&format!("source '{}'\n", floo_script_path.display()));
 }
