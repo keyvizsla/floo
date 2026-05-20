@@ -45,6 +45,9 @@ impl HelpPopup {
                 "d              Delete a fireplace".to_string(),
                 "h              Display help menu".to_string(),
                 "q              Quit floo".to_string(),
+                "<Tab>          Toggle between notes and about screen".to_string(),
+                "e              Edit notes or apply template (depending on current screen)"
+                    .to_string(),
             ]),
             rect: None,
         }
@@ -104,11 +107,11 @@ impl Component for HelpPopup {
         if let Some(rect) = self.rect {
             handle_scrollable_content_mouse(&mut self.content_state, &mouse, rect, 1);
         }
-        return Action::Noop;
+        Action::Noop
     }
 
     fn update(&mut self, _action: Action) -> Action {
-        return Action::Noop;
+        Action::Noop
     }
 
     fn render(&mut self, f: &mut Frame, rect: Rect) {

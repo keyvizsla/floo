@@ -141,8 +141,9 @@ impl NewFireplaceComponent {
             }
         }
 
-        return Action::Noop;
+        Action::Noop
     }
+
     fn render_dialog(&mut self, f: &mut Frame, area: Rect) {
         let focus_states = [
             self.dialog_state
@@ -224,11 +225,11 @@ impl Component for NewFireplaceComponent {
     }
 
     fn handle_mouse_events(&mut self, _mouse: MouseEvent) -> Action {
-        return Action::Noop;
+        Action::Noop
     }
 
     fn update(&mut self, _action: Action) -> Action {
-        return Action::Noop;
+        Action::Noop
     }
 
     fn render(&mut self, f: &mut Frame, rect: Rect) {

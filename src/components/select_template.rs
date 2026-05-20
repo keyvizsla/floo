@@ -165,11 +165,11 @@ impl Component for SelectTemplatePopup {
 
     fn handle_mouse_events(&mut self, _: MouseEvent) -> Action {
         // TODO: Support mouse stuff eventually
-        return Action::Noop;
+        Action::Noop
     }
 
     fn update(&mut self, _: Action) -> Action {
-        return Action::Noop;
+        Action::Noop
     }
 
     fn render(&mut self, f: &mut Frame, rect: Rect) {

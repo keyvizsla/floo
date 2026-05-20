@@ -60,7 +60,7 @@ impl Fireplace {
                 _ => {}
             }
         }
-        return None;
+        None
     }
 
     /// Get the description(readme contents) of the given project
@@ -81,7 +81,7 @@ impl Fireplace {
             }
         };
 
-        return Some(description);
+        Some(description)
     }
 
     /// Getter for the Fireplace's root directory path

@@ -40,7 +40,7 @@ pub fn get_safe_db_connection() -> Result<Connection> {
         (),
     )?;
 
-    return Ok(conn);
+    Ok(conn)
 }
 
 // Return a list of projects in the local database.
@@ -119,5 +119,5 @@ fn db_filepath() -> PathBuf {
     }
 
     let floo_directory = appdata_dir();
-    return floo_directory.join(".floo.db");
+    floo_directory.join(".floo.db")
 }

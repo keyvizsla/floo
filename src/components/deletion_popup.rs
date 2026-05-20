@@ -52,7 +52,6 @@ impl DeletionPopup {
         key_code: KeyCode,
         key: &crossterm::event::KeyEvent,
     ) -> Action {
-        // Copy focus target to avoid borrow issues
         let focus_target = self.dialog_state.current_focus().cloned();
 
         if let Some(DialogFocusTarget::Button(idx)) = focus_target {
@@ -75,7 +74,7 @@ impl DeletionPopup {
             }
         }
 
-        return Action::Noop;
+        Action::Noop
     }
 
     fn height(&self, area: Rect) -> u16 {
@@ -140,11 +139,11 @@ impl Component for DeletionPopup {
     }
 
     fn handle_mouse_events(&mut self, _mouse: MouseEvent) -> Action {
-        return Action::Noop;
+        Action::Noop
     }
 
     fn update(&mut self, _action: Action) -> Action {
-        return Action::Noop;
+        Action::Noop
     }
 
     fn render(&mut self, f: &mut Frame, rect: Rect) {

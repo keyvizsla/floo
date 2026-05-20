@@ -98,7 +98,7 @@ pub fn appdata_dir() -> PathBuf {
     if !floo_directory.exists() {
         std::fs::create_dir_all(&floo_directory).expect("Failed to create .floo directory");
     }
-    return floo_directory;
+    floo_directory
 }
 
 /// Return the path to the default/configured
