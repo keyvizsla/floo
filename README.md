@@ -31,7 +31,7 @@ the following actions manually in your terminal:
 
 The default actions can be overriden on a per fireplace basis
 by placing a `.floo` script in the directory to which your fireplace points.
-For more information read [the official documentation](https://keyvizsla.github.io/floo).
+For more information read our [quickstart](https://keyvizsla.github.io/floo/guide/quickstart.html) guide.
 
 ## Examples
 
