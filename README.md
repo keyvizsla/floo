@@ -33,13 +33,16 @@ The default actions can be overriden on a per fireplace basis
 by placing a `.floo` script in the directory to which your fireplace points.
 For more information read [the official documentation](https://keyvizsla.github.io/floo).
 
-## Example
+## Examples
 
-<Screen recording>
+![](assets/basic_example.gif)
+*Basic usage example of floo, we create a new fireplace which we then use to quicktravel into that directory, any .env or .envrc files of that directory are sources as well.*
 
-## Resources
+![](assets/tmux_example.gif)
+*More advanced usage example, we use a predefined template to define custom floo actions, to let floo know to start a tmux session with two windows when travelling to the fireplace.*
 
-[Manual](https://keyvizsla.github.io/floo/index.html)
+![](assets/notes_example.gif)
+*For convenience, floo allows you to also track notes for each fireplace, this supports markdown and can help you track where you left off or whatever else you want to remember.*
 
 ## Installing the latest stable version
 
@@ -50,7 +53,12 @@ eval "$(floo-bin init)"
 ```
 And restart your terminal.
 
-*Note: We are planning to release to other package managers in the future.*
+*Note: We are planning to release to other package managers in the future once floo becomes more stable.*
+
+## Resources
+
+You can find all relevant information about floo including a detailed usage manual in 
+[the official documentation](https://keyvizsla.github.io/floo/index.html)
 
 ## Known Limitations
 
