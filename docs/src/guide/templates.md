@@ -13,12 +13,36 @@ your system to get started from. Once you have selected a template, `floo` will 
 systems `$EDITOR`, where you can then tweak the exact contents of the template for the
 fireplace you are setting up.
 
-TODO: Insert gif of choosing and editing a template
+![](/assets/tmux_example.gif)
+*An example usage of the default tmux template*
 
 ## Creating new templates
 
-TODO Write docs how to create a template
+Creating a new template happens in two steps:
 
-TODO Insert gif of how this looks in practice
+1. Write and test the .floo script
+2. Declare the script as a template
 
+The first step we have outlined in the [quickstart](/guide/quickstart.html#defining-custom-actions) section of this guide.
+For the second step you simply run
 
+```sh
+floo template [path] [name]
+```
+
+where the path is the filepath of the .floo script you want to turn into a template and
+the name is the name under which floo will list your new template in all future template 
+selection screens.
+
+## Using floo variables
+
+To keep templates generic, you can make use of specific environment variables, which
+`floo` guarantees to you to be set every time before a .floo script is executed.
+This applies to the following variables:
+
+| Variable | Description |
+|---------------|-------------|
+| FLOO_DIR | The absolute path of the fireplace's configured directory|
+| FLOO_NAME | The name of the fireplace |
+
+Check out the default tmux template to see how to use these in practice.

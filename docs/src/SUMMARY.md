@@ -17,8 +17,3 @@
 # Contributing
 - [Contributing](guide/contributing.md)
 
-# Screenshots
-
-------------------------
-
-[Contributors](misc/contributors.md)

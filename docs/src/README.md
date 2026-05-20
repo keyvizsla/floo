@@ -36,21 +36,25 @@ remove fireplaces (project/workspace configurations) to it.
 Setting up a new fireplace is as easy as pressing `n` in the TUI and entering a name and root directory
 of your workspace. You only have to set up a fireplace once, **floo** will remember it for you afterwards.
 Once a fireplace is set up, you can simply run `floo`, select the desired fireplace in the TUI
-and your shell will be brought into the configured state, e.g. new tmux session, with two windows and
-all environment configurations sourced and everything else you could possibly think of.
+and your shell will be brought into the configured state. For me that typically is a new tmux session, with two windows and
+all environment configurations sourced and some small project specific adjustments.
 Configuring the concrete actions you want to have performed is as easy as placing a shell script named `.floo`
 into the corresponding project directory. **floo** will make sure the shell sources this script before
 passing control back to you, such that all modifications you have defined in your script are applied.
-**floo** assists you in setting up these scripts for your fireplaces, as it provides you with templates that
-you can modify and apply with ease. You may even add your own templates aligning with your concrete needs.
+**floo** assists you in setting up these scripts for your fireplaces by providing you with templates that
+you can modify and apply with ease.
+You may even add your own templates aligning with your concrete needs, to streamline setting up new fireplaces with your specific workflow.
 
-## Contributing
+## A first look
 
-**floo** is free and open source. You can find the source code on
-[GitHub](https://github.com/keyvizsla/floo) or alternatively on [Codeberg](https://codeberg.org/KeyVizsla/floo).
-If you encounter issues or missing features, do not hesitate to open an issue.
-Everyone is invited to contribute code and solve open issues, please read the [CONTRIBUTING](https://github.com/keyvizsla/floo/blob/main/CONTRIBUTING.md) guide
-for further information.
+![](assets/basic_example.gif)
+*Basic usage example of floo, we create a new fireplace which we then use to quicktravel into that directory, any .env or .envrc files of that directory are sources as well.*
+
+![](assets/tmux_example.gif)
+*More advanced usage example, we use a predefined template to define custom floo actions, to let floo know to start a tmux session with two windows when travelling to the fireplace.*
+
+![](assets/notes_example.gif)
+*For convenience, floo allows you to also track notes for each fireplace, this supports markdown and can help you track where you left off or whatever else you want to remember.*
 
 ## License
 

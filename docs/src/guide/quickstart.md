@@ -29,15 +29,47 @@ you can also run `floo create` which will start floo with a prefilled fireplace 
 so you don't have to manually insert your path.
 
 You have now successfully created your first fireplace and are all set to travel.
-If you want to know how to set up custom actions for your fireplace, templating and
-general usage tips, consult the *User Manual* section of this guide.
+
+## Defining custom actions
+
+You can define the specific actions that `floo` should take to transport you to a selected fireplace,
+by placing a `.floo` file in the corresponding directory of that fireplace.
+This script should be a script that your shell can source, upon which it will then be in the state
+that floo will later also bring the shell into.
+If floo cannot find such a script, it will perform its default actions, which correspond to
+
+```sh
+cd <fireplace directory>
+source .env # or .envrc whichever is available
+```
+
+For a gentle introduction, you can for example take a `cargo` project of yours and place
+a .floo script at its root that contains the following:
+
+```sh
+cd $FLOO_DIR
+alias run='cargo run'
+```
+
+If you now set up a fireplace in `floo` for this project and select it, your terminal should now be
+in that projects root directory and you should be able to call `run` instead of having to type out
+`cargo run`. This is of course just a small example of what one could do, the possibilities are limitless.
+
+You may have noticed that we accessed the `FLOO_DIR` variable in this script. `floo` exposes certain
+details about the fireplace you are traveling to via environment variables (more on which variables are available in the [templating section](/guide/templates.html) of these docs). In this way, you can avoid
+hard-coding things into your scripts. This also facilitates the re-usability of such scripts.
+If you were to want the same alias available for other cargo projects, you could just place the
+exact same .floo script in those directories and it would work out of the box due to this injection
+of environment variables.
+When you are at this point that you have found a common workflow that you want in multiple projects,
+you might want to consider turning this into a template, which allows `floo` to take care of inserting
+the .floo file for you. Check out the [templating section](/guide/templates.html) for that.
+
 
 ## Troubleshooting
 
 We will keep updating this section with common issues users run into and their fixes.
 Please help us in improving this documentation by raising an issue where you describe
 your troubles.
-Alternatively, you can send an email to [leon.koehn2002@gmail.com](mailto:leon.koehn2002@gmail.com?subject=Issues%20regarding%20floo).
-We will get back to you as soon as possible.
 If you were able to resolve your troubles, even if you think no one else would make that mistake,
 we always appreciate PRs updating this troubleshooting guide.
