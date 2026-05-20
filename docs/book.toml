@@ -4,4 +4,4 @@ authors = ["KeyVizsla"]
 language = "en"
 
 [preprocessor.variables.variables]
-floo_version = "0.1.0-beta.0"
+floo_version = "0.1.0-beta.1"

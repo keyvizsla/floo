@@ -143,8 +143,9 @@ impl Component for StartScreen {
     ██╔══╝  ██║     ██║   ██║██║   ██║
     ██║     ███████╗╚██████╔╝╚██████╔╝
     ╚═╝     ╚══════╝ ╚═════╝  ╚═════╝ ";
+        let version_str = format!(" v{}", env!("CARGO_PKG_VERSION"));
         let version_hint = Span::styled(
-            " v0.1.0-beta.0",
+            version_str,
             Style::default()
                 .fg(Color::DarkGray)
                 .add_modifier(Modifier::ITALIC),
