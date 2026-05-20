@@ -2,6 +2,9 @@ name: "Tests & Code Quality"
 
 on:
   push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "main" ]
 
 permissions:
   contents: write
