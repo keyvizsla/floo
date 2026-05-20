@@ -35,13 +35,13 @@ For more information read [the official documentation](https://keyvizsla.github.
 
 ## Examples
 
-![](assets/basic_example.gif)
+![](docs/src/assets/basic_example.gif)
 *Basic usage example of floo, we create a new fireplace which we then use to quicktravel into that directory, any .env or .envrc files of that directory are sources as well.*
 
-![](assets/tmux_example.gif)
+![](docs/src/assets/tmux_example.gif)
 *More advanced usage example, we use a predefined template to define custom floo actions, to let floo know to start a tmux session with two windows when travelling to the fireplace.*
 
-![](assets/notes_example.gif)
+![](docs/src/assets/notes_example.gif)
 *For convenience, floo allows you to also track notes for each fireplace, this supports markdown and can help you track where you left off or whatever else you want to remember.*
 
 ## Installing the latest stable version
