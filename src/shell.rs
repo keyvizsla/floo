@@ -65,3 +65,18 @@ fn set_floo_env(script: &mut String, fireplace: &Fireplace) {
     ));
     script.push_str(&format!("FLOO_NAME='{}'\n", fireplace.name));
 }
+
+/// Check that the shell environment was correctly configured for floo.
+/// Return an error if not.
+pub fn check_env(verbose: bool) -> io::Result<()> {
+    if std::env::var("FLOO_OUTPUT_FILE").is_err() {
+        let error_str =             "Please ensure you have added `eval \"$(floo-bin init)\"` to your .bashrc or .zshrc. and you run floo as `floo` and not as `floo-bin`";
+        if verbose {
+            eprintln!("{}", error_str);
+        }
+        return Err(io::Error::other(
+            "FLOO_OUTPUT_FILE not set",
+        ));
+    }
+    Ok(())
+}

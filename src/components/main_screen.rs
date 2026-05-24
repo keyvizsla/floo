@@ -43,6 +43,7 @@ use ratatui::widgets::Widget;
 pub struct MainScreen {
     projects: Vec<Fireplace>,
     description_scroll: u16,
+    notes_scroll: u16,
     tab_state: TabViewState,
     list_state: ListPickerState,
     toast_state: ToastState,
@@ -62,6 +63,7 @@ impl MainScreen {
         MainScreen {
             projects,
             description_scroll: 0,
+            notes_scroll: 0,
             deletion_popup: None,
             creation_popup: None,
             help_popup: None,
@@ -82,6 +84,7 @@ impl MainScreen {
         } else {
             self.list_state.select_next();
         }
+        self.reset_scroll();
     }
 
     fn select_previous_project(&mut self) {
@@ -90,6 +93,7 @@ impl MainScreen {
         } else {
             self.list_state.select_prev();
         }
+        self.reset_scroll();
     }
 
     pub fn add_project(&mut self, project: Fireplace) {
@@ -140,7 +144,9 @@ impl MainScreen {
         let notes = self.selected_project().notes;
         let parsed_text = render_markdown_to_lines(&notes);
 
-        let paragraph = Paragraph::new(parsed_text).wrap(Wrap { trim: false });
+        let paragraph = Paragraph::new(parsed_text)
+            .scroll((self.notes_scroll, 0))
+            .wrap(Wrap { trim: false });
         paragraph.render(area, buf);
     }
 
@@ -168,6 +174,24 @@ impl MainScreen {
         // We don't use render_with_clear on purpose, since that messes with the alignment of the toast
         Clear.render(toast_area, f.buffer_mut());
         toast.render(toast_area, f.buffer_mut());
+    }
+
+    fn scroll(&mut self, distance: i16) {
+        let target = if self.tab_state.selected_index == 0 {
+           &mut self.description_scroll
+        } else {
+            &mut self.notes_scroll
+        };
+        let target_i = *target as i16;
+        let res = target_i + distance;
+        if res >= 0 {
+            *target = res as u16;
+        }
+    }
+
+    fn reset_scroll(&mut self) {
+        self.notes_scroll = 0;
+        self.description_scroll = 0;
     }
 }
 
@@ -253,13 +277,11 @@ impl Component for MainScreen {
         // based on the open tab
         if key.modifiers == KeyModifiers::CONTROL {
             if let KeyCode::Char('d') = key.code {
-                self.description_scroll += 5;
+                self.scroll(5);
                 return Action::Noop;
             }
             if let KeyCode::Char('u') = key.code {
-                if self.description_scroll >= 5 {
-                    self.description_scroll -= 5;
-                }
+                self.scroll(-5);
                 return Action::Noop;
             }
         }

@@ -37,8 +37,9 @@ mod shell;
 mod state;
 mod utils;
 
-fn main() -> Result<(), io::Error> {
+fn main() -> io::Result<()> {
     let cli = Cli::parse();
+    shell::check_env(true)?;
     match &cli.command {
         Some(Command::Init) => {
             init_sys();
