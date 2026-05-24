@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+# This is not to be used yet, it is a work in progress.
+
 # ---------------------------------------- 
 # Installation script to be ran by users first
 # installing FLOO via curl.

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This is not to be used yet, it is a work in progress.
+
 # -------------------------------------------
 # Build FLOO and create all release files.
 # Upload the contents of the dist directory.
