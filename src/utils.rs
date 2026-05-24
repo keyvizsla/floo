@@ -55,23 +55,8 @@ pub fn replace_project(
 
 /// Outputs the floo shell wrapper function.
 /// Should only be used by the installer.
-pub fn init_sys() {
-    let shell_wrapper = r#"
-floo() {
-    local tmp_file
-    tmp_file="$(mktemp)"
-    export FLOO_OUTPUT_FILE="$tmp_file"
-
-    command floo-bin "$@"
-
-    if [ -s "$tmp_file" ]; then
-        . "$tmp_file"
-    fi
-
-    rm -f "$tmp_file"
-    unset FLOO_OUTPUT_FILE
-}
-"#;
+pub fn init_sys(shell: Shell) {
+    let shell_wrapper = shell::Commands::Init.render(shell);
 
     println!("{}", shell_wrapper);
 }

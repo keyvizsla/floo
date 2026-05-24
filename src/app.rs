@@ -16,6 +16,7 @@
 */
 
 use crate::action::Action;
+use crate::cli::Shell;
 use crate::components::component::Component;
 use crate::components::tui::Tui;
 use crate::db_handler;
@@ -39,11 +40,12 @@ pub struct App {
     state: AppState,
     terminal: Terminal<CrosstermBackend<Stdout>>,
     tui: Tui,
+    shell: Shell,
 }
 
 impl App {
     /// Instantiate a new floo app instance.
-    pub fn new() -> Result<Self, AppCreationError> {
+    pub fn new(shell: Shell) -> Result<Self, AppCreationError> {
         let state = AppState::init();
         let terminal = Self::init_terminal().map_err(|_| AppCreationError {})?;
         let mut tui = Tui::new(state.projects.clone());
@@ -52,6 +54,7 @@ impl App {
             state,
             terminal,
             tui,
+            shell,
         })
     }
 
@@ -82,7 +85,7 @@ impl App {
                         // Ignore errors in the database update, since these are not critical
                         let _ = db_handler::set_last_accessed_to_now(&project);
                         // TODO: Handle errors
-                        let _ = output_shell_cmd(&project, &Self::output_path());
+                        let _ = output_shell_cmd(&project, &Self::output_path(), self.shell);
                         self.cleanup();
                         return Ok(());
                     }
