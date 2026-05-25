@@ -39,7 +39,6 @@ mod utils;
 
 fn main() -> io::Result<()> {
     let cli = Cli::parse();
-    shell::check_env(true)?;
     match &cli.command {
         Some(Command::Init) => {
             init_sys();
@@ -70,6 +69,7 @@ fn main() -> io::Result<()> {
             Ok(())
         }
         None => {
+            shell::check_env(true)?;
             let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
             app.run().map_err(|_| io::Error::from(io::ErrorKind::Other))
         }
