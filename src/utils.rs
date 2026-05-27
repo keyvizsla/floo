@@ -232,3 +232,41 @@ fn copy_dir_all(src: impl AsRef<Path>, dest: impl AsRef<Path>) -> io::Result<()>
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+
+    use std::str::FromStr;
+
+    use super::*;
+
+    /// Verify that remove_project correctly removes a project that is contained in the given list
+    /// of projects.
+    #[test]
+    fn test_remove_contained_project() {
+        let project_to_remove = Fireplace::new(
+            "test_project".to_string(),
+            PathBuf::from_str(".").unwrap(),
+            "".to_string(),
+            0,
+        );
+        let other_project = Fireplace::new(
+            "test_project2".to_string(),
+            PathBuf::from_str(".").unwrap(),
+            "".to_string(),
+            0,
+        );
+        let mut all_projects = vec![project_to_remove.clone(), other_project];
+        remove_project(&mut all_projects, &project_to_remove);
+        assert!(!all_projects.contains(&project_to_remove));
+        assert_eq!(all_projects.len(), 1);
+    }
+
+    #[cfg(feature = "test-docker-linux")]
+    mod docker_linux_tests {
+        #[test]
+        fn some_conditional_test() {
+            assert!(true);
+        }
+    }
+}
