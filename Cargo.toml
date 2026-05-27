@@ -45,3 +45,11 @@ features = ["blocking", "json", "rustls-tls"]
 
 [features]
 bundled = ["rusqlite/bundled"]
+
+# ============================================================================
+# INTERNAL TESTING FEATURES
+# WARNING: The features below are strictly for CI/CD and Docker testing 
+# environments. Do not enable them in production or local development 
+# unless you are replicating a specific GitHub Actions pipeline.
+# ============================================================================
+test-docker-linux = []
