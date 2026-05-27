@@ -19,12 +19,14 @@ use crossterm::{
     ExecutableCommand,
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
+use directories::ProjectDirs;
 use edit::Builder;
 use ratatui::{Terminal, prelude::CrosstermBackend};
 use reqwest::blocking::get;
 use serde::Deserialize;
 use std::path::Path;
 
+use crate::errors::FlooError;
 use crate::fireplace::Fireplace;
 use std::{
     env, fs,
@@ -87,16 +89,31 @@ pub fn longest_line(text: &str) -> usize {
     max
 }
 
+/// Return the directory path to which floo writes persistent data.
+/// This function panics if the directory could not be resolved without issues.
 pub fn appdata_dir() -> PathBuf {
-    let path = env::var("XDG_DATA_HOME").ok().map(PathBuf::from);
-    if let Some(resolved_path) = path {
-        return resolved_path;
+    let override_data_dir = env::var("FLOO_APPDATA_DIR").ok().map(PathBuf::from);
+    if let Some(override_path) = override_data_dir {
+        return override_path;
     }
-    let home_directory =
-        PathBuf::from(env::var("HOME").expect("Cannot deduce apdata path without HOME directory"));
-    let floo_directory = home_directory.join(".local/share/floo/");
+    let floo_directory = ProjectDirs::from("", "", "floo")
+        .unwrap_or_else(|| {
+            panic!(
+                "{}",
+                FlooError::AppDataDirError(
+                    "Unable to determine valid appdata storage directory for floo.".to_string(),
+                )
+            )
+        })
+        .data_dir()
+        .to_path_buf();
     if !floo_directory.exists() {
-        std::fs::create_dir_all(&floo_directory).expect("Failed to create .floo directory");
+        std::fs::create_dir_all(&floo_directory).unwrap_or_else(|_| {
+            panic!(
+                "{}",
+                FlooError::AppDataDirError("Unable to create floo appdata directory.".to_string())
+            )
+        });
     }
     floo_directory
 }
@@ -205,9 +222,10 @@ pub fn install_local_templates(template_dir: &PathBuf) {
     copy_dir_all(template_dir, get_template_dir()).expect("Failed to install local templates.")
 }
 
-fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
+/// Copy all contents of the src directory to the dest directory recursively.
+fn copy_dir_all(src: impl AsRef<Path>, dest: impl AsRef<Path>) -> io::Result<()> {
     let src = src.as_ref();
-    let dst = dst.as_ref();
+    let dst = dest.as_ref();
 
     fs::create_dir_all(dst)?;
 

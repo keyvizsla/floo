@@ -15,8 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use std::fmt::Display;
+
 #[derive(Clone)]
 pub enum FlooError {
     DbUpdateError(String),
+    AppDataDirError(String),
     NoTemplates,
+}
+
+impl Display for FlooError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let base_error_message = "Please report this issue including some information about your system and the output of floo --version to: \
+            https://github.com/keyvizsla/floo/issues/new.";
+        match self {
+            Self::AppDataDirError(msg) | Self::DbUpdateError(msg) => write!(
+                f,
+                "{} \
+                 {}",
+                msg, base_error_message
+            ),
+            _ => write!(
+                f,
+                "Floo encountered an unexpected error. \
+                 {}",
+                base_error_message
+            ),
+        }
+    }
 }
