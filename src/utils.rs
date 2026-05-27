@@ -38,16 +38,18 @@ use crate::shell::ShellBackend;
 /// Remove a project from the given list of projects.
 /// If the project is not contained, nothing happens.
 pub fn remove_project(projects: &mut Vec<Fireplace>, project_to_delete: &Fireplace) {
-    projects.retain(|p| p.name != project_to_delete.name);
+    projects.retain(|p| p != project_to_delete);
 }
 
+/// Replace a project from the given list of projects by the new_project.
+/// This modifies the list of projects in-place.
 pub fn replace_project(
     projects: &mut Vec<Fireplace>,
     old_project: &Fireplace,
     new_project: Fireplace,
 ) {
     for project in projects {
-        if project.name == old_project.name {
+        if project == old_project {
             *project = new_project;
             return;
         }

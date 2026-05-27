@@ -110,3 +110,11 @@ impl Fireplace {
         self.directory.join(".floo").exists()
     }
 }
+
+impl PartialEq for Fireplace {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
+}
+
+impl Eq for Fireplace {}
