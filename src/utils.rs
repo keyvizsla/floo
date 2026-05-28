@@ -81,6 +81,7 @@ pub fn appdata_dir() -> PathBuf {
     if let Some(override_path) = override_data_dir {
         return override_path;
     }
+
     let floo_directory = ProjectDirs::from("", "", "floo")
         .unwrap_or_else(|| {
             panic!(
