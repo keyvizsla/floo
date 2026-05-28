@@ -166,7 +166,7 @@ impl Commands {
                             if (
                                 ($tmp_file | path exists)
                                 and
-                                ((ls $tmp_file).0.size > 0)
+                                ((ls $tmp_file).0.size > 0b)
                             ) {
                                 open $tmp_file
                             } else {
