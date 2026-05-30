@@ -43,6 +43,9 @@ version = "0.12"
 default-features = false
 features = ["blocking", "json", "rustls-tls"]
 
+[dev-dependencies]
+insta = "1.47.2"
+
 [features]
 bundled = ["rusqlite/bundled"]
 

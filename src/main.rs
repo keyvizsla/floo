@@ -37,6 +37,9 @@ mod shell;
 mod state;
 mod utils;
 
+#[cfg(feature = "test-docker-linux")]
+mod test_utils;
+
 fn main() -> io::Result<()> {
     let cli = Cli::parse();
     match &cli.command {
