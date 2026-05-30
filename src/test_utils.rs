@@ -2,6 +2,7 @@ use ratatui::{backend::TestBackend, prelude::*};
 
 pub struct TuiFixture {
     terminal: Terminal<TestBackend>,
+    name: String,
 }
 
 impl TuiFixture {
@@ -16,7 +17,15 @@ impl TuiFixture {
             std::env::set_var("TZ", "UTC");
         }
 
-        Self { terminal }
+        Self {
+            terminal,
+            name: String::new(),
+        }
+    }
+
+    pub fn name(mut self, name: &str) -> Self {
+        self.name = name.to_string();
+        self
     }
 
     /// Renders a component using a closure that provides the Frame,
@@ -25,9 +34,10 @@ impl TuiFixture {
     where
         F: FnOnce(&mut Frame),
     {
+        assert!(!self.name.is_empty(), "Must name snapshot.");
         self.terminal.draw(render_fn).unwrap();
         let buffer = self.terminal.backend().buffer();
-        insta::assert_snapshot!(format!("{buffer:?}"));
+        insta::assert_snapshot!(self.name.clone(), format!("{buffer:?}"));
     }
 }
 

@@ -191,7 +191,7 @@ mod tests {
         /// Verify the layout of the base start screen.
         #[test]
         fn layout_basic() {
-            let mut fx = TuiFixture::default();
+            let mut fx = TuiFixture::default().name("start_screen.layout_basic");
             let mut screen = StartScreen::default();
 
             fx.render_and_snapshot(|frame| {
@@ -203,7 +203,7 @@ mod tests {
         /// corresponding keys are pressed.
         #[test]
         fn layout_open_popup() {
-            let mut fx = TuiFixture::default();
+            let mut fx = TuiFixture::default().name("start_screen.layout_open_popup");
             let mut screen = StartScreen::default();
             let input_event = Event::Key(KeyEvent::new(KeyCode::Char('n'), KeyModifiers::NONE));
 
