@@ -41,7 +41,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: test/images/linux/Dockerfile
+          file: images/linux/Dockerfile
           push: true
           tags: format('ghcr.io/{0}:latest', env.IMAGE_NAME)
           cache-from: type=gha
@@ -74,7 +74,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: test/images/linux/Dockerfile
+          file: images/linux/Dockerfile
           push: false
           load: true 
           tags: local-test-env:latest
