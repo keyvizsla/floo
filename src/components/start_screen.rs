@@ -213,5 +213,21 @@ mod tests {
                 screen.render(frame, frame.area());
             });
         }
+
+        /// Verify that an error popup is shown when an error is received from
+        /// the parent component.
+        #[test]
+        fn layout_error_popup() {
+            let mut fx = TuiFixture::default().name("start_screen.layout_error_popup");
+            let mut screen = StartScreen::default();
+
+            screen.update(Action::Error(FlooError::DbUpdateError(
+                "Could not add fireplace.".to_string(),
+            )));
+
+            fx.render_and_snapshot(|frame| {
+                screen.render(frame, frame.area());
+            });
+        }
     }
 }
