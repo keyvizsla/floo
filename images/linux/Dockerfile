@@ -9,4 +9,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-CMD ["cargo", "test", "--features", "test-docker-linux"]
+CMD ["cargo", "test", "--features", "test-docker-linux-bash"]

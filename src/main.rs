@@ -37,7 +37,7 @@ mod shell;
 mod state;
 mod utils;
 
-#[cfg(feature = "test-docker-linux")]
+#[cfg(feature = "test-docker-linux-bash")]
 mod test_utils;
 
 fn main() -> io::Result<()> {

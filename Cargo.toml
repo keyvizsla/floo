@@ -55,4 +55,4 @@ bundled = ["rusqlite/bundled"]
 # environments. Do not enable them in production or local development 
 # unless you are replicating a specific GitHub Actions pipeline.
 # ============================================================================
-test-docker-linux = []
+test-docker-linux-bash = []

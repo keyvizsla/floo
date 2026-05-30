@@ -262,7 +262,7 @@ mod tests {
         assert_eq!(all_projects.len(), 1);
     }
 
-    #[cfg(feature = "test-docker-linux")]
+    #[cfg(feature = "test-docker-linux-bash")]
     mod docker_linux_tests {
         #[test]
         fn some_conditional_test() {
