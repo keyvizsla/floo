@@ -16,13 +16,13 @@
 */
 
 use crate::action::Action;
-use crate::components::component::{Component, ComponentCreationError};
+use crate::components::component::{handle_component_event, Component, ComponentCreationError};
 use crate::fireplace::Fireplace;
 use crate::utils::longest_line;
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
-use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::widgets::Paragraph;
+use ratatui::Frame;
 use ratatui_interact::components::{DialogConfig, DialogFocusTarget, DialogState};
 use ratatui_interact::events::{is_enter, is_tab};
 use ratatui_interact::prelude::PopupDialog;
@@ -127,11 +127,7 @@ impl Component for DeletionPopup {
             return Action::Noop;
         }
 
-        match event.unwrap() {
-            Event::Key(e) => self.handle_key_events(e),
-            Event::Mouse(m) => self.handle_mouse_events(m),
-            _ => Action::Noop,
-        }
+        handle_component_event(self, event)
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {

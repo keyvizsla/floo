@@ -16,11 +16,11 @@
 */
 
 use crate::action::Action;
-use crate::components::component::{Component, ComponentCreationError};
+use crate::components::component::{handle_component_event, Component, ComponentCreationError};
 use crate::fireplace::Fireplace;
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
-use ratatui::Frame;
 use ratatui::layout::{Constraint, Direction, Layout, Rect};
+use ratatui::Frame;
 use ratatui_interact::components::{
     DialogConfig, DialogFocusTarget, DialogState, Input, InputState,
 };
@@ -213,11 +213,7 @@ impl Component for NewFireplaceComponent {
             return Action::Noop;
         }
 
-        match event.unwrap() {
-            Event::Key(e) => self.handle_key_events(e),
-            Event::Mouse(m) => self.handle_mouse_events(m),
-            _ => Action::Noop,
-        }
+        handle_component_event(self, event)
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {

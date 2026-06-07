@@ -16,18 +16,18 @@
 */
 
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent};
-use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect, Spacing};
 use ratatui::style::Modifier;
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Clear, Paragraph, Wrap};
+use ratatui::Frame;
 use ratatui_interact::components::{Tab, TabView, TabViewState};
 use ratatui_interact::prelude::{ListPicker, ListPickerState, Toast, ToastState, ToastStyle};
 use ratatui_interact::traits::Focusable;
 use ratatui_interact::utils::render_markdown_to_lines;
 
 use crate::action::Action;
-use crate::components::component::{Component, ComponentCreationError};
+use crate::components::component::{handle_component_event, Component, ComponentCreationError};
 use crate::components::deletion_popup::DeletionPopup;
 use crate::components::help_popup::HelpPopup;
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
@@ -178,7 +178,7 @@ impl MainScreen {
 
     fn scroll(&mut self, distance: i16) {
         let target = if self.tab_state.selected_index == 0 {
-           &mut self.description_scroll
+            &mut self.description_scroll
         } else {
             &mut self.notes_scroll
         };
@@ -266,10 +266,7 @@ impl Component for MainScreen {
             return Action::Noop;
         }
 
-        match event.unwrap() {
-            Event::Key(e) => self.handle_key_events(e),
-            _ => Action::Noop,
-        }
+        handle_component_event(self, event)
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {

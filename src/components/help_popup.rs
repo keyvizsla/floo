@@ -16,14 +16,14 @@
 */
 
 use crate::action::Action;
-use crate::components::component::{Component, ComponentCreationError};
+use crate::components::component::{handle_component_event, Component, ComponentCreationError};
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
-use ratatui::Frame;
 use ratatui::layout::Rect;
+use ratatui::Frame;
 use ratatui_interact::components::{DialogConfig, DialogState};
 use ratatui_interact::prelude::{
-    PopupDialog, ScrollableContent, ScrollableContentState, handle_scrollable_content_key,
-    handle_scrollable_content_mouse,
+    handle_scrollable_content_key, handle_scrollable_content_mouse, PopupDialog, ScrollableContent,
+    ScrollableContentState,
 };
 
 pub struct HelpPopup {
@@ -86,11 +86,7 @@ impl Component for HelpPopup {
             return Action::Noop;
         }
 
-        match event.unwrap() {
-            Event::Key(e) => self.handle_key_events(e),
-            Event::Mouse(m) => self.handle_mouse_events(m),
-            _ => Action::Noop,
-        }
+        handle_component_event(self, event)
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
