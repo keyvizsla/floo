@@ -85,7 +85,11 @@ impl App {
                         // Ignore errors in the database update, since these are not critical
                         let _ = db_handler::set_last_accessed_to_now(&project);
                         // TODO: Handle errors
-                        let _ = output_shell_cmd(&project, &Self::output_path(), self.shell);
+                        let _ = output_shell_cmd(
+                            &project,
+                            &Self::output_path(),
+                            self.shell.get_backend(),
+                        );
                         self.cleanup();
                         return Ok(());
                     }
