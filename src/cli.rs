@@ -18,6 +18,8 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
+use crate::shell::{BashBackend, NuBackend, ShellBackend, ZshBackend};
+
 #[derive(Parser)]
 #[command(
     name = "floo",
@@ -69,4 +71,14 @@ pub enum Shell {
     Bash,
     Zsh,
     Nu,
+}
+
+impl Shell {
+    pub fn get_backend(&self) -> Box<dyn ShellBackend> {
+        match self {
+            Self::Bash => Box::new(BashBackend),
+            Self::Zsh => Box::new(ZshBackend),
+            Self::Nu => Box::new(NuBackend),
+        }
+    }
 }

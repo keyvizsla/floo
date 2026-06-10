@@ -15,6 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use std::{
+    env, fs,
+    io::{self, Stdout, stdout},
+    path::{Path, PathBuf},
+};
+
 use crossterm::{
     ExecutableCommand,
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
@@ -24,15 +30,10 @@ use edit::Builder;
 use ratatui::{Terminal, prelude::CrosstermBackend};
 use reqwest::blocking::get;
 use serde::Deserialize;
-use std::path::Path;
 
 use crate::errors::FlooError;
 use crate::fireplace::Fireplace;
-use std::{
-    env, fs,
-    io::{self, Stdout, stdout},
-    path::PathBuf,
-};
+use crate::shell::ShellBackend;
 
 /// Remove a project from the given list of projects.
 /// If the project is not contained, nothing happens.
@@ -55,8 +56,8 @@ pub fn replace_project(
 
 /// Outputs the floo shell wrapper function.
 /// Should only be used by the installer.
-pub fn init_sys(shell: Shell) {
-    let shell_wrapper = shell::Commands::Init.render(shell);
+pub fn init_sys(shell: Box<dyn ShellBackend>) {
+    let shell_wrapper = shell.init();
 
     println!("{}", shell_wrapper);
 }

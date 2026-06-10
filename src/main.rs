@@ -41,7 +41,7 @@ fn main() -> io::Result<()> {
     let cli = Cli::parse();
     match &cli.command {
         Some(Command::Init) => {
-            init_sys(cli.shell);
+            init_sys(cli.shell.get_backend());
             Ok(())
         }
         Some(Command::Create { path }) => {
