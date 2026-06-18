@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
-use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
-use ratatui::{layout::Rect, Frame};
+use crossterm::event::{KeyCode, KeyEvent, MouseEvent};
+use ratatui::{Frame, layout::Rect};
 use ratatui_interact::{
     components::file_explorer::{FileExplorerMode, FooterBuilder},
     prelude::{
@@ -11,7 +11,7 @@ use ratatui_interact::{
 
 use crate::{
     action::Action,
-    components::component::{handle_component_event, Component, ComponentCreationError},
+    components::component::{Component, ComponentCreationError},
 };
 
 pub struct SelectTemplatePopup {
@@ -122,14 +122,6 @@ impl Component for SelectTemplatePopup {
         self.dialog_state.focus.set(DialogFocusTarget::Child(0));
         self.dialog_state.show();
         Ok(())
-    }
-
-    fn handle_events(&mut self, event: Option<Event>) -> Action {
-        if event.is_none() {
-            return Action::Noop;
-        }
-
-        handle_component_event(self, event)
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {

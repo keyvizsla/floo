@@ -16,14 +16,14 @@
 */
 
 use crate::action::Action;
-use crate::components::component::{handle_component_event, Component, ComponentCreationError};
-use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
-use ratatui::layout::Rect;
+use crate::components::component::{Component, ComponentCreationError};
+use crossterm::event::{KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
+use ratatui::layout::Rect;
 use ratatui_interact::components::{DialogConfig, DialogState};
 use ratatui_interact::prelude::{
-    handle_scrollable_content_key, handle_scrollable_content_mouse, PopupDialog, ScrollableContent,
-    ScrollableContentState,
+    PopupDialog, ScrollableContent, ScrollableContentState, handle_scrollable_content_key,
+    handle_scrollable_content_mouse,
 };
 
 pub struct HelpPopup {
@@ -79,14 +79,6 @@ impl Component for HelpPopup {
     fn init(&mut self) -> Result<(), ComponentCreationError> {
         self.dialog_state.show();
         Ok(())
-    }
-
-    fn handle_events(&mut self, event: Option<Event>) -> Action {
-        if event.is_none() {
-            return Action::Noop;
-        }
-
-        handle_component_event(self, event)
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {

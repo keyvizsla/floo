@@ -16,15 +16,15 @@
 */
 
 use crate::action::Action;
-use crate::components::component::{handle_component_event, Component, ComponentCreationError};
+use crate::components::component::{Component, ComponentCreationError, should_handle_key_event};
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
 use crate::errors::FlooError;
 use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
+use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use ratatui::prelude::{Color, Line, Modifier, Span, Style, Stylize, Text};
 use ratatui::widgets::Widget;
 use ratatui::widgets::{Clear, Paragraph};
-use ratatui::Frame;
 use ratatui_interact::components::{Toast, ToastState, ToastStyle};
 
 #[derive(Default)]
@@ -87,7 +87,11 @@ impl Component for StartScreen {
             return Action::Noop;
         }
 
-        handle_component_event(self, event)
+        match event {
+            Some(Event::Key(key)) if should_handle_key_event(&key) => self.handle_key_events(key),
+            Some(Event::Mouse(mouse)) => self.handle_mouse_events(mouse),
+            _ => Action::Noop,
+        }
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {

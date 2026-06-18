@@ -16,18 +16,18 @@
 */
 
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent};
+use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect, Spacing};
 use ratatui::style::Modifier;
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Clear, Paragraph, Wrap};
-use ratatui::Frame;
 use ratatui_interact::components::{Tab, TabView, TabViewState};
 use ratatui_interact::prelude::{ListPicker, ListPickerState, Toast, ToastState, ToastStyle};
 use ratatui_interact::traits::Focusable;
 use ratatui_interact::utils::render_markdown_to_lines;
 
 use crate::action::Action;
-use crate::components::component::{handle_component_event, Component, ComponentCreationError};
+use crate::components::component::{Component, ComponentCreationError, should_handle_key_event};
 use crate::components::deletion_popup::DeletionPopup;
 use crate::components::help_popup::HelpPopup;
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
@@ -266,7 +266,11 @@ impl Component for MainScreen {
             return Action::Noop;
         }
 
-        handle_component_event(self, event)
+        match event {
+            Some(Event::Key(key)) if should_handle_key_event(&key) => self.handle_key_events(key),
+            Some(Event::Mouse(mouse)) => self.handle_mouse_events(mouse),
+            _ => Action::Noop,
+        }
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {

@@ -16,11 +16,11 @@
 */
 
 use crate::action::Action;
-use crate::components::component::{handle_component_event, Component, ComponentCreationError};
+use crate::components::component::{Component, ComponentCreationError};
 use crate::fireplace::Fireplace;
-use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
-use ratatui::layout::{Constraint, Direction, Layout, Rect};
+use crossterm::event::{KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
+use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui_interact::components::{
     DialogConfig, DialogFocusTarget, DialogState, Input, InputState,
 };
@@ -206,14 +206,6 @@ impl Component for NewFireplaceComponent {
         self.dialog_state.focus.set(DialogFocusTarget::Child(0));
         self.dialog_state.show();
         Ok(())
-    }
-
-    fn handle_events(&mut self, event: Option<Event>) -> Action {
-        if event.is_none() {
-            return Action::Noop;
-        }
-
-        handle_component_event(self, event)
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
