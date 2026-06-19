@@ -27,7 +27,7 @@ use ratatui_interact::traits::Focusable;
 use ratatui_interact::utils::render_markdown_to_lines;
 
 use crate::action::Action;
-use crate::components::component::{Component, ComponentCreationError, should_handle_key_event};
+use crate::components::component::{Component, ComponentCreationError};
 use crate::components::deletion_popup::DeletionPopup;
 use crate::components::help_popup::HelpPopup;
 use crate::components::new_fireplace_popup::NewFireplaceComponent;
@@ -193,6 +193,68 @@ impl MainScreen {
         self.notes_scroll = 0;
         self.description_scroll = 0;
     }
+
+    fn handle_open_popup_event(&mut self, event: Event) -> Option<Action> {
+        if let Some(popup) = &mut self.deletion_popup {
+            match popup.handle_events(Some(event)) {
+                Action::ClosePopup => self.deletion_popup = None,
+                Action::DeleteFireplace(project) => {
+                    self.deletion_popup = None;
+                    return Some(Action::DeleteFireplace(project));
+                }
+                _ => {
+                    return Some(Action::Noop);
+                }
+            }
+            return Some(Action::Noop);
+        }
+
+        if let Some(popup) = &mut self.creation_popup {
+            match popup.handle_events(Some(event)) {
+                Action::ClosePopup => self.creation_popup = None,
+                Action::AddFireplace(project) => {
+                    self.creation_popup = None;
+                    return Some(Action::AddFireplace(project));
+                }
+                _ => {
+                    return Some(Action::Noop);
+                }
+            }
+            return Some(Action::Noop);
+        }
+
+        if let Some(popup) = &mut self.help_popup {
+            match popup.handle_events(Some(event)) {
+                Action::ClosePopup => self.help_popup = None,
+                _ => {
+                    return Some(Action::Noop);
+                }
+            }
+            return Some(Action::Noop);
+        }
+
+        if let Some(popup) = &mut self.template_popup {
+            match popup.handle_events(Some(event)) {
+                Action::ClosePopup => self.template_popup = None,
+                Action::SelectTemplate {
+                    template,
+                    project: _,
+                } => {
+                    self.template_popup = None;
+                    return Some(Action::SelectTemplate {
+                        template,
+                        project: Some(self.selected_project()),
+                    });
+                }
+                _ => {
+                    return Some(Action::Noop);
+                }
+            }
+            return Some(Action::Noop);
+        }
+
+        None
+    }
 }
 
 impl Component for MainScreen {
@@ -202,78 +264,12 @@ impl Component for MainScreen {
         Ok(())
     }
 
-    fn handle_events(&mut self, event: Option<Event>) -> Action {
-        self.toast_state.clear_if_expired();
-        if event.is_none() {
-            return Action::Noop;
-        }
-
-        if let Some(popup) = &mut self.deletion_popup {
-            match popup.handle_events(event) {
-                Action::ClosePopup => self.deletion_popup = None,
-                Action::DeleteFireplace(project) => {
-                    self.deletion_popup = None;
-                    return Action::DeleteFireplace(project);
-                }
-                _ => {
-                    return Action::Noop;
-                }
-            }
-            return Action::Noop;
-        }
-
-        if let Some(popup) = &mut self.creation_popup {
-            match popup.handle_events(event) {
-                Action::ClosePopup => self.creation_popup = None,
-                Action::AddFireplace(project) => {
-                    self.creation_popup = None;
-                    return Action::AddFireplace(project);
-                }
-                _ => {
-                    return Action::Noop;
-                }
-            }
-            return Action::Noop;
-        }
-
-        if let Some(popup) = &mut self.help_popup {
-            match popup.handle_events(event) {
-                Action::ClosePopup => self.help_popup = None,
-                _ => {
-                    return Action::Noop;
-                }
-            }
-            return Action::Noop;
-        }
-
-        if let Some(popup) = &mut self.template_popup {
-            match popup.handle_events(event) {
-                Action::ClosePopup => self.template_popup = None,
-                Action::SelectTemplate {
-                    template,
-                    project: _,
-                } => {
-                    self.template_popup = None;
-                    return Action::SelectTemplate {
-                        template,
-                        project: Some(self.selected_project()),
-                    };
-                }
-                _ => {
-                    return Action::Noop;
-                }
-            }
-            return Action::Noop;
-        }
-
-        match event {
-            Some(Event::Key(key)) if should_handle_key_event(&key) => self.handle_key_events(key),
-            Some(Event::Mouse(mouse)) => self.handle_mouse_events(mouse),
-            _ => Action::Noop,
-        }
-    }
-
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
+        self.toast_state.clear_if_expired();
+        if let Some(action) = self.handle_open_popup_event(Event::Key(key)) {
+            return action;
+        }
+
         // TODO: Distinguish between notes and description scroll
         // based on the open tab
         if key.modifiers == KeyModifiers::CONTROL {
@@ -346,8 +342,10 @@ impl Component for MainScreen {
         }
     }
 
-    fn handle_mouse_events(&mut self, _mouse: MouseEvent) -> Action {
-        Action::Noop
+    fn handle_mouse_events(&mut self, mouse: MouseEvent) -> Action {
+        self.toast_state.clear_if_expired();
+        self.handle_open_popup_event(Event::Mouse(mouse))
+            .unwrap_or(Action::Noop)
     }
 
     fn update(&mut self, action: Action) -> Action {
