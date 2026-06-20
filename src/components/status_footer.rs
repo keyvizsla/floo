@@ -1,4 +1,4 @@
-use crossterm::event::{Event, KeyEvent, MouseEvent};
+use crossterm::event::{KeyEvent, MouseEvent};
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Rect},
@@ -46,10 +46,6 @@ impl Widget for StatusFooter {
 impl Component for StatusFooter {
     fn init(&mut self) -> Result<(), ComponentCreationError> {
         Ok(())
-    }
-
-    fn handle_events(&mut self, _: Option<Event>) -> Action {
-        Action::Noop
     }
 
     fn handle_key_events(&mut self, _: KeyEvent) -> Action {

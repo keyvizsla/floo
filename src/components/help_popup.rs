@@ -17,7 +17,7 @@
 
 use crate::action::Action;
 use crate::components::component::{Component, ComponentCreationError};
-use crossterm::event::{Event, KeyCode, KeyEvent, MouseEvent};
+use crossterm::event::{KeyCode, KeyEvent, MouseEvent};
 use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui_interact::components::{DialogConfig, DialogState};
@@ -79,18 +79,6 @@ impl Component for HelpPopup {
     fn init(&mut self) -> Result<(), ComponentCreationError> {
         self.dialog_state.show();
         Ok(())
-    }
-
-    fn handle_events(&mut self, event: Option<Event>) -> Action {
-        if event.is_none() {
-            return Action::Noop;
-        }
-
-        match event.unwrap() {
-            Event::Key(e) => self.handle_key_events(e),
-            Event::Mouse(m) => self.handle_mouse_events(m),
-            _ => Action::Noop,
-        }
     }
 
     fn handle_key_events(&mut self, key: KeyEvent) -> Action {
