@@ -56,7 +56,7 @@ pub fn replace_project(
 
 /// Outputs the floo shell wrapper function.
 /// Should only be used by the installer.
-pub fn init_sys(shell: Box<dyn ShellBackend>) {
+pub fn init_sys(shell: &dyn ShellBackend) {
     let shell_wrapper = shell.init();
 
     println!("{}", shell_wrapper);
