@@ -74,11 +74,11 @@ pub enum Shell {
 }
 
 impl Shell {
-    pub fn get_backend(&self) -> Box<dyn ShellBackend> {
+    pub fn get_backend(&self) -> &dyn ShellBackend {
         match self {
-            Self::Bash => Box::new(BashBackend),
-            Self::Zsh => Box::new(ZshBackend),
-            Self::Nu => Box::new(NuBackend),
+            Self::Bash => &BashBackend,
+            Self::Zsh => &ZshBackend,
+            Self::Nu => &NuBackend,
         }
     }
 }

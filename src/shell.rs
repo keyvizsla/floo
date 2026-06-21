@@ -26,7 +26,7 @@ use crate::fireplace::Fireplace;
 pub fn output_shell_cmd(
     fireplace: &Fireplace,
     output_path: &PathBuf,
-    shell: Box<dyn ShellBackend>,
+    shell: &dyn ShellBackend,
 ) -> io::Result<()> {
     std::fs::write(output_path, shell.out_file(fireplace)?)
 }
