@@ -41,11 +41,11 @@ fn main() -> io::Result<()> {
     let cli = Cli::parse();
     match &cli.command {
         Some(Command::Init) => {
-            init_sys();
+            init_sys(cli.shell.get_backend());
             Ok(())
         }
         Some(Command::Create { path }) => {
-            let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
+            let mut app = App::new(cli.shell).map_err(|_| io::Error::from(io::ErrorKind::Other))?;
             let mut prefill = Fireplace::default();
             let _ = prefill.set_directory(path.clone());
             app.run_with_prefilled_popup(Some(prefill))
@@ -70,7 +70,7 @@ fn main() -> io::Result<()> {
         }
         None => {
             shell::check_env(true)?;
-            let mut app = App::new().map_err(|_| io::Error::from(io::ErrorKind::Other))?;
+            let mut app = App::new(cli.shell).map_err(|_| io::Error::from(io::ErrorKind::Other))?;
             app.run().map_err(|_| io::Error::from(io::ErrorKind::Other))
         }
     }

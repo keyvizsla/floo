@@ -15,6 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use std::{
+    env, fs,
+    io::{self, Stdout, stdout},
+    path::{Path, PathBuf},
+};
+
 use crossterm::{
     ExecutableCommand,
     terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
@@ -24,15 +30,10 @@ use edit::Builder;
 use ratatui::{Terminal, prelude::CrosstermBackend};
 use reqwest::blocking::get;
 use serde::Deserialize;
-use std::path::Path;
 
 use crate::errors::FlooError;
 use crate::fireplace::Fireplace;
-use std::{
-    env, fs,
-    io::{self, Stdout, stdout},
-    path::PathBuf,
-};
+use crate::shell::ShellBackend;
 
 /// Remove a project from the given list of projects.
 /// If the project is not contained, nothing happens.
@@ -55,23 +56,8 @@ pub fn replace_project(
 
 /// Outputs the floo shell wrapper function.
 /// Should only be used by the installer.
-pub fn init_sys() {
-    let shell_wrapper = r#"
-floo() {
-    local tmp_file
-    tmp_file="$(mktemp)"
-    export FLOO_OUTPUT_FILE="$tmp_file"
-
-    command floo-bin "$@"
-
-    if [ -s "$tmp_file" ]; then
-        . "$tmp_file"
-    fi
-
-    rm -f "$tmp_file"
-    unset FLOO_OUTPUT_FILE
-}
-"#;
+pub fn init_sys(shell: &dyn ShellBackend) {
+    let shell_wrapper = shell.init();
 
     println!("{}", shell_wrapper);
 }
@@ -96,6 +82,7 @@ pub fn appdata_dir() -> PathBuf {
     if let Some(override_path) = override_data_dir {
         return override_path;
     }
+
     let floo_directory = ProjectDirs::from("", "", "floo")
         .unwrap_or_else(|| {
             panic!(

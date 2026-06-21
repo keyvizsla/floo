@@ -15,8 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
+
+use crate::shell::{BashBackend, NuBackend, ShellBackend, ZshBackend};
 
 #[derive(Parser)]
 #[command(
@@ -31,6 +33,8 @@ use std::path::PathBuf;
 pub struct Cli {
     #[command(subcommand)]
     pub command: Option<Command>,
+    #[arg(long, value_enum, default_value = "bash")]
+    pub shell: Shell,
 }
 
 #[derive(Subcommand)]
@@ -60,4 +64,21 @@ pub enum Command {
         #[arg(long, value_name = "PATH")]
         local: Option<PathBuf>,
     },
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum Shell {
+    Bash,
+    Zsh,
+    Nu,
+}
+
+impl Shell {
+    pub fn get_backend(&self) -> &dyn ShellBackend {
+        match self {
+            Self::Bash => &BashBackend,
+            Self::Zsh => &ZshBackend,
+            Self::Nu => &NuBackend,
+        }
+    }
 }
