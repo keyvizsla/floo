@@ -1,54 +1,53 @@
-# TODO: Uncomment when done debugging tests
-# name: "Build & Deploy Docs"
-# 
-# on:
-#   push:
-#     branches: [ "**" ]
-#   pull_request:
-#     branches: [ "main" ]
-# 
-# permissions:
-#   contents: write
-#   pages: write
-#   id-token: write
-# 
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
-# 
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v4
-#         with:
-#           fetch-depth: 0
-# 
-#       - name: Install Rust toolchain
-#         uses: dtolnay/rust-toolchain@stable
-# 
-#       - name: Cache Cargo dependencies
-#         uses: Swatinem/rust-cache@v2
-# 
-#       - name: Install mdBook and mdbook-variables
-#         run: |
-#           cargo install mdbook
-#           cargo install mdbook-variables
-# 
-#       - name: Build documentation
-#         run: |
-#           cd docs
-#           mdbook build
-# 
-#       - name: Setup GitHub Pages
-#         if: github.ref == 'refs/heads/main'
-#         uses: actions/configure-pages@v4
-# 
-#       - name: Upload Pages artifact
-#         if: github.ref == 'refs/heads/main'
-#         uses: actions/upload-pages-artifact@v3
-#         with:
-#           path: docs/book
-# 
-#       - name: Deploy to GitHub Pages
-#         if: github.ref == 'refs/heads/main'
-#         id: deployment
-#         uses: actions/deploy-pages@v4
+name: "Build & Deploy Docs"
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install mdBook and mdbook-variables
+        run: |
+          cargo install mdbook
+          cargo install mdbook-variables
+
+      - name: Build documentation
+        run: |
+          cd docs
+          mdbook build
+
+      - name: Setup GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/book
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        id: deployment
+        uses: actions/deploy-pages@v4
