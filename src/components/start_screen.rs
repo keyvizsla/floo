@@ -177,3 +177,57 @@ impl Component for StartScreen {
         self.render_notifications(f, area);
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    #[cfg(feature = "test-docker-linux-bash")]
+    mod docker_linux_tests {
+        use crossterm::event::KeyModifiers;
+
+        use super::super::*;
+        use crate::{components::start_screen::StartScreen, test_utils::TuiFixture};
+
+        /// Verify the layout of the base start screen.
+        #[test]
+        fn layout_basic() {
+            let mut fx = TuiFixture::default().name("linux.bash.start_screen.layout_basic");
+            let mut screen = StartScreen::default();
+
+            fx.render_and_snapshot(|frame| {
+                screen.render(frame, frame.area());
+            });
+        }
+
+        /// Verify that the fireplace creation popup is opened after the
+        /// corresponding keys are pressed.
+        #[test]
+        fn layout_open_popup() {
+            let mut fx = TuiFixture::default().name("linux.bash.start_screen.layout_open_popup");
+            let mut screen = StartScreen::default();
+            let input_event = Event::Key(KeyEvent::new(KeyCode::Char('n'), KeyModifiers::NONE));
+
+            screen.handle_events(Some(input_event));
+
+            fx.render_and_snapshot(|frame| {
+                screen.render(frame, frame.area());
+            });
+        }
+
+        /// Verify that an error popup is shown when an error is received from
+        /// the parent component.
+        #[test]
+        fn layout_error_popup() {
+            let mut fx = TuiFixture::default().name("linux.bash.start_screen.layout_error_popup");
+            let mut screen = StartScreen::default();
+
+            screen.update(Action::Error(FlooError::DbUpdateError(
+                "Could not add fireplace.".to_string(),
+            )));
+
+            fx.render_and_snapshot(|frame| {
+                screen.render(frame, frame.area());
+            });
+        }
+    }
+}

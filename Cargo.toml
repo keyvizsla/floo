@@ -43,5 +43,16 @@ version = "0.12"
 default-features = false
 features = ["blocking", "json", "rustls-tls"]
 
+[dev-dependencies]
+insta = "1.47.2"
+
 [features]
 bundled = ["rusqlite/bundled"]
+
+# ============================================================================
+# INTERNAL TESTING FEATURES
+# WARNING: The features below are strictly for CI/CD and Docker testing 
+# environments. Do not enable them in production or local development 
+# unless you are replicating a specific GitHub Actions pipeline.
+# ============================================================================
+test-docker-linux-bash = []

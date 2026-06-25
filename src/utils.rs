@@ -38,16 +38,18 @@ use crate::shell::ShellBackend;
 /// Remove a project from the given list of projects.
 /// If the project is not contained, nothing happens.
 pub fn remove_project(projects: &mut Vec<Fireplace>, project_to_delete: &Fireplace) {
-    projects.retain(|p| p.name != project_to_delete.name);
+    projects.retain(|p| p != project_to_delete);
 }
 
+/// Replace a project from the given list of projects by the new_project.
+/// This modifies the list of projects in-place.
 pub fn replace_project(
     projects: &mut Vec<Fireplace>,
     old_project: &Fireplace,
     new_project: Fireplace,
 ) {
     for project in projects {
-        if project.name == old_project.name {
+        if project == old_project {
             *project = new_project;
             return;
         }
@@ -229,4 +231,42 @@ fn copy_dir_all(src: impl AsRef<Path>, dest: impl AsRef<Path>) -> io::Result<()>
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+
+    use std::str::FromStr;
+
+    use super::*;
+
+    /// Verify that remove_project correctly removes a project that is contained in the given list
+    /// of projects.
+    #[test]
+    fn test_remove_contained_project() {
+        let project_to_remove = Fireplace::new(
+            "test_project".to_string(),
+            PathBuf::from_str(".").unwrap(),
+            "".to_string(),
+            0,
+        );
+        let other_project = Fireplace::new(
+            "test_project2".to_string(),
+            PathBuf::from_str(".").unwrap(),
+            "".to_string(),
+            0,
+        );
+        let mut all_projects = vec![project_to_remove.clone(), other_project];
+        remove_project(&mut all_projects, &project_to_remove);
+        assert!(!all_projects.contains(&project_to_remove));
+        assert_eq!(all_projects.len(), 1);
+    }
+
+    #[cfg(feature = "test-docker-linux-bash")]
+    mod docker_linux_tests {
+        #[test]
+        fn some_conditional_test() {
+            assert!(true);
+        }
+    }
 }

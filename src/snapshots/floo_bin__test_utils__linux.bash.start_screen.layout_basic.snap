@@ -1,0 +1,41 @@
+---
+source: src/test_utils.rs
+expression: "format!(\"{buffer:?}\")"
+---
+Buffer {
+    area: Rect { x: 0, y: 0, width: 80, height: 20 },
+    content: [
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+        "                         ███████╗██╗      ██████╗  ██████╗                      ",
+        "                         ██╔════╝██║     ██╔═══██╗██╔═══██╗                     ",
+        "                         █████╗  ██║     ██║   ██║██║   ██║                     ",
+        "                         ██╔══╝  ██║     ██║   ██║██║   ██║                     ",
+        "                         ██║     ███████╗╚██████╔╝╚██████╔╝                     ",
+        "                         ╚═╝     ╚══════╝ ╚═════╝  ╚═════╝                      ",
+        "                                      v0.1.1                                    ",
+        "                                                                                ",
+        "             Your floo network is dark, no fireplaces are connected.            ",
+        "                       To add a destination, press n or %                       ",
+        "                                                                                ",
+        "                                                                                ",
+        "                                                                                ",
+    ],
+    styles: [
+        x: 0, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 37, y: 13, fg: DarkGray, bg: Reset, underline: Reset, modifier: ITALIC,
+        x: 44, y: 13, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 13, y: 15, fg: Reset, bg: Reset, underline: Reset, modifier: BOLD,
+        x: 68, y: 15, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 23, y: 16, fg: DarkGray, bg: Reset, underline: Reset, modifier: NONE,
+        x: 51, y: 16, fg: LightCyan, bg: Reset, underline: Reset, modifier: BOLD,
+        x: 52, y: 16, fg: DarkGray, bg: Reset, underline: Reset, modifier: NONE,
+        x: 56, y: 16, fg: LightCyan, bg: Reset, underline: Reset, modifier: BOLD,
+        x: 57, y: 16, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+    ]
+}

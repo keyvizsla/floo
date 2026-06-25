@@ -1,0 +1,24 @@
+name: Run Unit Tests
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/keyvizsla/floo-linux:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Cargo Tests
+        run: cargo test --features test-docker-linux-bash

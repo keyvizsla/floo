@@ -1,36 +1,25 @@
-name: "Tests & Code Quality"
-
 on:
   push:
-    branches: [ "*" ]
+    branches: [ "**" ]
   pull_request:
     branches: [ "main" ]
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
 jobs:
-  run_test_check_code_quality:
+  clippy:
+    name: "Clippy Check"
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
 
       - name: Cache Cargo dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Run Unittests
-        run: |
-          cargo test
-
       - name: Check Code Quality
-        run: |
-          cargo clippy -- --deny warnings
+        run: cargo clippy -- --deny warnings
