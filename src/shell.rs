@@ -102,16 +102,23 @@ impl ShellBackend for ZshBackend {
 
 impl ShellBackend for NuBackend {
     fn init(&self) -> &'static str {
-        r#"def --env --wrapped floo [...args] {
+        r#"
+        def --env --wrapped floo [...args] {
             let tmp = (mktemp)
             $env.FLOO_OUTPUT_FILE = $tmp
-            ^floo-bin ...$args
-            let out = (if (($tmp | path exists) and ((ls $tmp).0.size > 0b)) { open $tmp } else { {} })
-            load-env $out.env
-            cd $out.cwd }
-            rm -rf $tmp
+            ^floo-bin --shell nu ...$args
+
+            let out = (if (($tmp | path exists) and ((ls $tmp).0.size > 0b)) { open $tmp } else { '' }) | from json
+
+            if not ($out | is-empty) {
+                if ('env' in $out) { load-env $out.env }
+                if ('dir' in $out) { cd $out.dir }
+            }
+
+            rm -f $tmp
             hide-env FLOO_OUTPUT_FILE
-        }"#
+        }
+        "#
     }
     fn out_file(&self, fireplace: &Fireplace) -> io::Result<String> {
         let mut env: HashMap<String, String> = HashMap::new();
