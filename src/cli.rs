@@ -30,7 +30,6 @@ use crate::shell::{BashBackend, NuBackend, ShellBackend, ZshBackend};
     after_help = "Homepage: https://keyvizsla.github.io/floo\nRepository: https://github.com/keyvizsla/floo",
     help_template = "{before-help}{name} {version}{author-section}{about-section}\n{usage-heading} {usage}\n\n{all-args}{after-help}"
 )]
-
 pub struct Cli {
     #[command(subcommand)]
     pub command: Option<Command>,
