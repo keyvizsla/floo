@@ -54,6 +54,7 @@ pub trait ShellBackend {
 pub struct BashBackend;
 pub struct ZshBackend;
 pub struct NuBackend;
+pub struct FishBackend;
 
 impl ShellBackend for BashBackend {
     fn init(&self) -> &'static str {
@@ -96,6 +97,24 @@ impl ShellBackend for ZshBackend {
         BashBackend.init()
     }
     fn out_file(&self, fireplace: &Fireplace) -> io::Result<String> {
+        BashBackend.out_file(fireplace)
+    }
+}
+
+impl ShellBackend for FishBackend {
+    fn init(&self) -> &'static str {
+        r#"function floo
+            set -l tmp (mktemp)
+            set -gx FLOO_OUTPUT_FILE $tmp
+            command floo-bin --shell fish $argv
+            if test -s $tmp
+                source $tmp
+            end
+            rm -f $tmp
+        end"#
+    }
+    fn out_file(&self, fireplace: &Fireplace) -> io::Result<String> {
+        // NOTE: Fish supports the same sourcing syntax as Bash
         BashBackend.out_file(fireplace)
     }
 }

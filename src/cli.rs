@@ -18,7 +18,7 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
-use crate::shell::{BashBackend, NuBackend, ShellBackend, ZshBackend};
+use crate::shell::{BashBackend, FishBackend, NuBackend, ShellBackend, ZshBackend};
 
 #[derive(Parser)]
 #[command(
@@ -72,6 +72,7 @@ pub enum Shell {
     Bash,
     Zsh,
     Nu,
+    Fish,
 }
 
 impl Shell {
@@ -80,6 +81,7 @@ impl Shell {
             Self::Bash => &BashBackend,
             Self::Zsh => &ZshBackend,
             Self::Nu => &NuBackend,
+            Self::Fish => &FishBackend,
         }
     }
 }
