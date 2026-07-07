@@ -58,6 +58,16 @@ And restart your terminal.
 
 *Note: floo was initially developed with bash in mind. Due to the fundamentally different paradigms of nushell, we havent been able to port its full functionality to this shell, yet. In nushell, you cannot create custom .floo scripts to define custom actions to take when travelling to a fireplace. In nushell, floo will always perform the default action of bringing you into the selected fireplace's project directory and sourcing any .env/.envrc files in that directory.*
 
+## Fish
+
+Run the following command:
+
+```bash
+echo 'eval "$(floo-bin init --shell fish)"' >> ~/.config/fish/config.fish
+```
+
+And restart your terminal.
+
 ## Other Shells
 
 If your favorite shell is missing from this list, we are sorry to let you know that *floo* does not yet support it.
